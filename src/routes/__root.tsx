@@ -6,19 +6,38 @@ import {
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanstackDevtools } from '@tanstack/react-devtools'
 
-import Header from '../components/Header'
-
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
+import { Toaster } from '@/components/ui/sonner'
+import { getCurrentUser } from '@/server/appwrite'
+import { ThemeProvider } from 'next-themes'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
+const scripts: React.DetailedHTMLProps<
+  React.ScriptHTMLAttributes<HTMLScriptElement>,
+  HTMLScriptElement
+>[] = []
+
+if (import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC) {
+  scripts.push({
+    src: import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+  })
+}
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  loader: async () => {
+    const currentUser = await getCurrentUser()
+
+    return {
+      currentUser,
+    }
+  },
   head: () => ({
     meta: [
       {
@@ -29,7 +48,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Imagine App',
       },
     ],
     links: [
@@ -38,6 +57,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: appCss,
       },
     ],
+    scripts: [...scripts],
   }),
 
   shellComponent: RootDocument,
@@ -50,20 +70,27 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
-        <TanstackDevtools
-          config={{
-            position: 'bottom-left',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            TanStackQueryDevtools,
-          ]}
-        />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+          <TanstackDevtools
+            config={{
+              position: 'bottom-left',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              TanStackQueryDevtools,
+            ]}
+          />
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>
