@@ -43,14 +43,14 @@ async function signIn({
   setCookie('appwrite-session-secret', session.secret, {
     httpOnly: true,
     secure: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     path: '/',
   })
 
   setCookie('appwrite-session-id', session.userId, {
     httpOnly: true,
     secure: true,
-    sameSite: 'strict',
+    sameSite: 'none',
     path: '/',
   })
 }

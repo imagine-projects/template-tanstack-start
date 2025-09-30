@@ -27,6 +27,7 @@ const scripts: React.DetailedHTMLProps<
 if (import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC) {
   scripts.push({
     src: import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+    type: "module"
   })
 }
 
