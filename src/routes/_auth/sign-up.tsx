@@ -3,11 +3,7 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import {
-  createFileRoute,
-  Link,
-  useSearch,
-} from '@tanstack/react-router'
+import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
 import { z } from 'zod'
 import { AuthCard } from '@/components/auth/auth-card'
 import { AuthForm } from '@/components/auth/auth-form'
@@ -32,7 +28,7 @@ const signUpSchema = z.object({
 })
 
 function SignUpPage() {
-  const search = useSearch({ from: "/_auth/sign-up" })
+  const search = useSearch({ from: '/_auth/sign-up' })
   const signUp = useServerFn(signUpFn)
   const form = useForm({
     resolver: zodResolver(signUpSchema),

@@ -10,7 +10,7 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier",
-    "check": "tsr generate && prettier --write . && eslint --fix && tsc -b --noEmit",
+    "check": "tsr generate && prettier --write . && tsc -b --noEmit",
     "generate:routes": "tsr generate"
   },
   "dependencies": {

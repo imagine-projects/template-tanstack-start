@@ -37,7 +37,7 @@ export async function getCurrentUser() {
   } else {
     const client = await createSessionClient(session!)
     const currentUser = await client.account.get()
-    return currentUser;
+    return currentUser
   }
 }
 

@@ -23,7 +23,8 @@ export function ImaginePlaceholder() {
         {currentUser ? (
           <>
             <p className="text-foreground/70">
-              You are signed in as <span className="font-medium">{currentUser.email}</span>
+              You are signed in as{' '}
+              <span className="font-medium">{currentUser.email}</span>
             </p>
             <Button size="sm" onClick={() => signOut()}>
               Sign out

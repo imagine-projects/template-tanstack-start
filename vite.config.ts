@@ -3,7 +3,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
-import devtoolsJson from 'vite-plugin-devtools-json';
+import devtoolsJson from 'vite-plugin-devtools-json'
 
 const config = defineConfig({
   plugins: [
@@ -17,9 +17,9 @@ const config = defineConfig({
     viteReact(),
   ],
   server: {
-    host: "::",
+    host: '::',
     allowedHosts: true,
-    hmr: process.env.DISABLE_HMR === "true" ? false : true,
+    hmr: process.env.DISABLE_HMR === 'true' ? false : true,
   },
 })
 

@@ -1,10 +1,10 @@
-import { signOutFn } from '@/server/functions/auth';
+import { signOutFn } from '@/server/functions/auth'
 import { useLoaderData } from '@tanstack/react-router'
-import { useServerFn } from '@tanstack/react-start';
+import { useServerFn } from '@tanstack/react-start'
 
 export function useAuth() {
   const { currentUser } = useLoaderData({ from: '__root__' })
-  const signOut = useServerFn(signOutFn);
+  const signOut = useServerFn(signOutFn)
 
   return {
     currentUser,

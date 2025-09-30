@@ -1,10 +1,16 @@
-import * as React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import * as React from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 
 interface AuthCardProps {
-  title: string;
-  description: string;
-  children: React.ReactNode;
+  title: string
+  description: string
+  children: React.ReactNode
 }
 
 export function AuthCard({ title, description, children }: AuthCardProps) {
@@ -13,10 +19,12 @@ export function AuthCard({ title, description, children }: AuthCardProps) {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-lg md:text-2xl">{title}</CardTitle>
-          <CardDescription className="text-sm md:text-base">{description}</CardDescription>
+          <CardDescription className="text-sm md:text-base">
+            {description}
+          </CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>
       </Card>
     </div>
-  );
+  )
 }

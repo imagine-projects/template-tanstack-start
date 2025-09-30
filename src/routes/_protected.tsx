@@ -1,4 +1,3 @@
-
 import { createSessionClient } from '@/server/appwrite'
 import { redirect } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
