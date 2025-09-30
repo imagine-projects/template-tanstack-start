@@ -78,7 +78,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         >
           {children}
           <Toaster />
-          <TanStackDevtools
+          {/* <TanStackDevtools
             config={{
               position: 'bottom-left',
             }}
@@ -89,7 +89,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               },
               TanStackQueryDevtools,
             ]}
-          />
+          /> */}
         </ThemeProvider>
         <Scripts />
       </body>
