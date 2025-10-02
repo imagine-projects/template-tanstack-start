@@ -3,8 +3,7 @@
  * These should only be imported in server-side actions (SSR, functions).
  */
 
-import { Client, Account, Models, Storage, Users } from 'node-appwrite'
-import { getAppwriteSession } from './functions/auth'
+import { Client, Account, Storage, Users } from 'node-appwrite'
 
 const getAppwriteClientCredentials = () => {
   const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT
@@ -26,18 +25,6 @@ const getAppwriteClientCredentials = () => {
     endpoint,
     projectId,
     apiKey,
-  }
-}
-
-export async function getCurrentUser(): Promise<Models.User | null> {
-  const session = await getAppwriteSession()
-
-  if (!session) {
-    return null
-  } else {
-    const client = await createSessionClient(session!)
-    const currentUser = await client.account.get()
-    return currentUser
   }
 }
 

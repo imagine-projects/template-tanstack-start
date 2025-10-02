@@ -9,7 +9,6 @@ import { AuthCard } from '@/components/auth/auth-card'
 import { AuthForm } from '@/components/auth/auth-form'
 import { AuthField } from '@/components/auth/auth-field'
 import { signInFn } from '@/server/functions/auth'
-import { useServerFn } from '@tanstack/react-start'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -29,7 +28,6 @@ const signInSchema = z.object({
 
 function SignInPage() {
   const search = useSearch({ from: '/_auth/sign-in' })
-  const signIn = useServerFn(signInFn)
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -40,12 +38,7 @@ function SignInPage() {
 
   const signInMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signInSchema>) => {
-      const { email, password } = data
-      await signIn({
-        email,
-        password,
-        redirect: search.redirect || '/',
-      })
+      await signInFn({ data })
     },
     onError: (error: Error) => {
       console.error('Sign in error:', error)

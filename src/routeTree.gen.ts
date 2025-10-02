@@ -17,6 +17,7 @@ import { Route as ProtectedExampleProtectedRouteRouteImport } from './routes/_pr
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthSignOutRouteImport } from './routes/_auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
+import { Route as ApiHelloRouteImport } from './routes/_api/hello'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -56,8 +57,14 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => AuthRoute,
 } as any)
+const ApiHelloRoute = ApiHelloRouteImport.update({
+  id: '/_api/hello',
+  path: '/hello',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/hello': typeof ApiHelloRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
 }
 export interface FileRoutesByTo {
+  '/hello': typeof ApiHelloRoute
   '/sign-in': typeof AuthSignInRoute
   '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
+  '/_api/hello': typeof ApiHelloRoute
   '/_auth/sign-in': typeof AuthSignInRoute
   '/_auth/sign-out': typeof AuthSignOutRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
@@ -85,18 +94,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/hello'
     | '/sign-in'
     | '/sign-out'
     | '/sign-up'
     | '/example-protected-route'
     | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/sign-out' | '/sign-up' | '/example-protected-route' | '/'
+  to:
+    | '/hello'
+    | '/sign-in'
+    | '/sign-out'
+    | '/sign-up'
+    | '/example-protected-route'
+    | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/_protected'
     | '/_public'
+    | '/_api/hello'
     | '/_auth/sign-in'
     | '/_auth/sign-out'
     | '/_auth/sign-up'
@@ -108,6 +125,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   ProtectedRoute: typeof ProtectedRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
+  ApiHelloRoute: typeof ApiHelloRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -168,6 +186,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignInRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_api/hello': {
+      id: '/_api/hello'
+      path: '/hello'
+      fullPath: '/hello'
+      preLoaderRoute: typeof ApiHelloRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -212,6 +237,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   ProtectedRoute: ProtectedRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
+  ApiHelloRoute: ApiHelloRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -40,12 +40,7 @@ function SignUpPage() {
 
   const signUpMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signUpSchema>) => {
-      const { email, password } = data
-      await signUp({
-        email,
-        password,
-        redirect: search.redirect || '/',
-      })
+      await signUp({ data })
     },
     onError: (error: Error) => {
       form.setError('root', { message: error.message })

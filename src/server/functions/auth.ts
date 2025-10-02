@@ -1,11 +1,8 @@
-import { handleEmbeddedPreview } from '@/.imagine/imagine-preview-token'
-import {
-  createAdminClient,
-  createSessionClient,
-  getCurrentUser,
-} from '@/server/appwrite'
+import { createServerFn } from '@tanstack/react-start'
+import z from 'zod'
 import { redirect } from '@tanstack/react-router'
-import { createServerOnlyFn } from '@tanstack/react-start'
+import { createAdminClient, createSessionClient } from '../lib/appwrite'
+import { AppwriteException, ID } from 'node-appwrite'
 import {
   deleteCookie,
   getCookie,
@@ -13,27 +10,24 @@ import {
   setCookie,
   setResponseStatus,
 } from '@tanstack/react-start/server'
-import { AppwriteException, ID } from 'node-appwrite'
-import z from 'zod'
+import { handleEmbeddedPreview } from '@/server/lib/imagine-preview-token-utils'
 
-const signUpInSchema = z.object({
-  email: z.email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  redirect: z.string().optional(),
-})
+export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const session = getCookie(`appwrite-session-secret`)
 
-export const getAppwriteSession = createServerOnlyFn(async () => {
-  const session = getCookie(`appwrite-session-secret`)
+    if (!session) {
+      return null
+    }
 
-  if (!session) {
-    return null
-  }
+    return session
+  },
+)
 
-  return session
-})
-
-export const setSessionCookies = createServerOnlyFn(
-  async ({ id, secret }: { id: string; secret: string }) => {
+export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ id: z.string(), secret: z.string() }))
+  .handler(async ({ data }) => {
+    const { id, secret } = data
     setCookie(`appwrite-session-secret`, secret, {
       httpOnly: true,
       secure: true,
@@ -45,65 +39,29 @@ export const setSessionCookies = createServerOnlyFn(
       secure: true,
       sameSite: 'none',
     })
-  },
-)
-
-// export const setSessionCookies = createServerFn({ method: 'POST' })
-//   .inputValidator(
-//     z.object({
-//       id: z.string(),
-//       secret: z.string(),
-//     }),
-//   )
-//   .handler(async (ctx) => {
-//     setCookie(`appwrite-session-secret`, ctx.data.secret, {
-//       httpOnly: true,
-//       secure: true,
-//       sameSite: 'none',
-//     })
-
-//     setCookie(`appwrite-session-id`, ctx.data.id, {
-//       httpOnly: true,
-//       secure: true,
-//       sameSite: 'none',
-//     })
-//   })
-
-async function signIn({
-  email,
-  password,
-}: {
-  email: string
-  password: string
-}) {
-  const { account } = await createAdminClient()
-  const session = await account.createEmailPasswordSession({
-    email,
-    password,
   })
 
-  setSessionCookies({ id: session.$id, secret: session.secret })
-}
+const signUpInSchema = z.object({
+  email: z.email('Please enter a valid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  redirect: z.string().optional(),
+})
 
-export const signUpFn = createServerOnlyFn(
-  async ({
-    email,
-    password,
-    redirect: redirectUrl,
-  }: {
-    email: string
-    password: string
-    redirect: string
-  }) => {
-    // export const signUpFn = createServerOnlyFn({ method: 'POST' })
-    // .inputValidator(signUpInSchema)
-    // .handler(async (ctx) => {
-    // const { email, password } = ctx.data
+export const signUpFn = createServerFn({ method: 'POST' })
+  .inputValidator(signUpInSchema)
+  .handler(async ({ data }) => {
+    const { email, password, redirect: redirectUrl } = data
     const { account } = await createAdminClient()
 
     try {
       await account.create({ userId: ID.unique(), email, password })
-      await signIn({ email, password })
+      const session = await account.createEmailPasswordSession({
+        email,
+        password,
+      })
+      setAppwriteSessionCookiesFn({
+        data: { id: session.$id, secret: session.secret },
+      })
     } catch (_error) {
       const error = _error as AppwriteException
       setResponseStatus(error.code)
@@ -118,26 +76,22 @@ export const signUpFn = createServerOnlyFn(
     } else {
       throw redirect({ to: '/' })
     }
-  },
-)
+  })
 
-export const signInFn = createServerOnlyFn(
-  async ({
-    email,
-    password,
-    redirect: redirectUrl,
-  }: {
-    email: string
-    password: string
-    redirect: string
-  }) => {
-    // export const signInFn = createServerOnlyFn({ method: 'POST' })
-    // .inputValidator(signUpInSchema)
-    // .handler(async (ctx) => {
-    // const { email, password } = ctx.data
+export const signInFn = createServerFn({ method: 'POST' })
+  .inputValidator(signUpInSchema)
+  .handler(async ({ data }) => {
+    const { email, password, redirect: redirectUrl } = data
 
     try {
-      await signIn({ email, password })
+      const { account } = await createAdminClient()
+      const session = await account.createEmailPasswordSession({
+        email,
+        password,
+      })
+      setAppwriteSessionCookiesFn({
+        data: { id: session.$id, secret: session.secret },
+      })
     } catch (_error) {
       const error = _error as AppwriteException
       setResponseStatus(error.code)
@@ -152,42 +106,59 @@ export const signInFn = createServerOnlyFn(
     } else {
       throw redirect({ to: '/' })
     }
+  })
+
+export const signOutFn = createServerFn({ method: 'POST' }).handler(
+  async () => {
+    const session = await getAppwriteSessionFn()
+
+    if (session) {
+      const { account } = await createSessionClient(session)
+      await account.deleteSession({ sessionId: 'current' })
+      deleteCookie(`appwrite-session-secret`)
+      deleteCookie(`appwrite-session-id`)
+    }
+
+    throw redirect({ to: '/' })
   },
 )
 
-export const signOutFn = createServerOnlyFn(async () => {
-  const session = getCookie(`appwrite-session-secret`)
+export const authMiddleware = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const currentUser = await getCurrentUser()
 
-  if (session) {
-    const { account } = await createSessionClient(session)
-    await account.deleteSession({ sessionId: 'current' })
-    deleteCookie(`appwrite-session-secret`)
-    deleteCookie(`appwrite-session-id`)
-  }
-
-  throw redirect({ to: '/' })
-})
-
-export const authMiddleware = createServerOnlyFn(async () => {
-  const currentUser = await getCurrentUser()
-
-  if (currentUser) {
-    return {
-      currentUser,
+    if (currentUser) {
+      return {
+        currentUser,
+      }
     }
-  }
 
-  const request = getRequest()
-  const imaginePreviewToken = request.headers.get('x-imagine-preview-token')
+    const request = getRequest()
+    const imaginePreviewToken = request.headers.get('x-imagine-preview-token')
 
-  if (imaginePreviewToken) {
-    const previewUser = await handleEmbeddedPreview(imaginePreviewToken)
-    return {
-      currentUser: previewUser,
+    if (imaginePreviewToken) {
+      const previewUser = await handleEmbeddedPreview(imaginePreviewToken)
+      return {
+        currentUser: previewUser,
+      }
     }
-  }
 
-  return {
-    currentUser: null,
-  }
-})
+    return {
+      currentUser: null,
+    }
+  },
+)
+
+export const getCurrentUser = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const session = await getAppwriteSessionFn()
+
+    if (!session) {
+      return null
+    } else {
+      const client = await createSessionClient(session!)
+      const currentUser = await client.account.get()
+      return currentUser
+    }
+  },
+)

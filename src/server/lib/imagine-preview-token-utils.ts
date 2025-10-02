@@ -2,7 +2,7 @@
  * @imagine-hidden
  * @imagine-readonly
  */
-import { setSessionCookies } from '@/server/functions/auth'
+import { setAppwriteSessionCookiesFn } from '@/server/functions/auth'
 import { Account, Client, Models, Users } from 'node-appwrite'
 
 export async function handleEmbeddedPreview(
@@ -17,7 +17,9 @@ export async function handleEmbeddedPreview(
   // Then, we generate a session for the user
   const session = await createUserSession(userId)
   // Then, we attach the session to the cookie
-  setSessionCookies({ data: { id: session.$id, secret: session.secret } })
+  setAppwriteSessionCookiesFn({
+    data: { id: session.$id, secret: session.secret },
+  })
   return tokenUser
 }
 
