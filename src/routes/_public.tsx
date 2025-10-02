@@ -3,7 +3,7 @@ import { authMiddleware } from '@/server/functions/auth'
 
 export const Route = createFileRoute('/_public')({
   loader: async () => {
-    const { currentUser } = await authMiddleware();
+    const { currentUser } = await authMiddleware()
 
     return {
       currentUser,

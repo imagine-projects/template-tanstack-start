@@ -9,7 +9,7 @@
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
-    "format": "prettier",
+    "format": "prettier --write .",
     "check": "tsr generate && prettier --write . && tsc -b --noEmit",
     "generate:routes": "tsr generate"
   },

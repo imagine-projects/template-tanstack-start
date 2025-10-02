@@ -11,11 +11,12 @@ module.exports = {
       watch: false,
       env_file: '.env',
       env: {
-        PORT: "3000",
+        PORT: '3000',
         VITE_APPWRITE_ENDPOINT: process.env.VITE_APPWRITE_ENDPOINT,
         VITE_APPWRITE_PROJECT_ID: process.env.VITE_APPWRITE_PROJECT_ID,
         VITE_APPWRITE_API_KEY: process.env.VITE_APPWRITE_API_KEY,
-        VITE_INSTRUMENTATION_SCRIPT_SRC: process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+        VITE_INSTRUMENTATION_SCRIPT_SRC:
+          process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
       },
     },
     {
@@ -28,11 +29,12 @@ module.exports = {
       watch: false,
       env_file: '.env',
       env: {
-        PORT: "3000",
+        PORT: '3000',
         VITE_APPWRITE_ENDPOINT: process.env.VITE_APPWRITE_ENDPOINT,
         VITE_APPWRITE_PROJECT_ID: process.env.VITE_APPWRITE_PROJECT_ID,
         VITE_APPWRITE_API_KEY: process.env.VITE_APPWRITE_API_KEY,
-        VITE_INSTRUMENTATION_SCRIPT_SRC: process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+        VITE_INSTRUMENTATION_SCRIPT_SRC:
+          process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
       },
     },
   ],

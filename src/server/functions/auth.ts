@@ -85,11 +85,19 @@ async function signIn({
   setSessionCookies({ id: session.$id, secret: session.secret })
 }
 
-
-export const signUpFn = createServerOnlyFn(async ({ email, password, redirect: redirectUrl }: { email: string, password: string, redirect: string }) => {
-// export const signUpFn = createServerOnlyFn({ method: 'POST' })
-  // .inputValidator(signUpInSchema)
-  // .handler(async (ctx) => {
+export const signUpFn = createServerOnlyFn(
+  async ({
+    email,
+    password,
+    redirect: redirectUrl,
+  }: {
+    email: string
+    password: string
+    redirect: string
+  }) => {
+    // export const signUpFn = createServerOnlyFn({ method: 'POST' })
+    // .inputValidator(signUpInSchema)
+    // .handler(async (ctx) => {
     // const { email, password } = ctx.data
     const { account } = await createAdminClient()
 
@@ -110,13 +118,22 @@ export const signUpFn = createServerOnlyFn(async ({ email, password, redirect: r
     } else {
       throw redirect({ to: '/' })
     }
-  })
+  },
+)
 
-export const signInFn = createServerOnlyFn(async ({ email, password, redirect: redirectUrl }: { email: string, password: string, redirect: string }) => {
-
-// export const signInFn = createServerOnlyFn({ method: 'POST' })
-  // .inputValidator(signUpInSchema)
-  // .handler(async (ctx) => {
+export const signInFn = createServerOnlyFn(
+  async ({
+    email,
+    password,
+    redirect: redirectUrl,
+  }: {
+    email: string
+    password: string
+    redirect: string
+  }) => {
+    // export const signInFn = createServerOnlyFn({ method: 'POST' })
+    // .inputValidator(signUpInSchema)
+    // .handler(async (ctx) => {
     // const { email, password } = ctx.data
 
     try {
@@ -135,7 +152,8 @@ export const signInFn = createServerOnlyFn(async ({ email, password, redirect: r
     } else {
       throw redirect({ to: '/' })
     }
-  })
+  },
+)
 
 export const signOutFn = createServerOnlyFn(async () => {
   const session = getCookie(`appwrite-session-secret`)
