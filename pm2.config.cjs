@@ -2,9 +2,26 @@
 module.exports = {
   apps: [
     {
-      name: 'devserver',
+      name: 'dev',
       cwd: '/app',
       script: 'bun run dev',
+      exec_mode: 'fork',
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      env_file: '.env',
+      env: {
+        PORT: "3000",
+        VITE_APPWRITE_ENDPOINT: process.env.VITE_APPWRITE_ENDPOINT,
+        VITE_APPWRITE_PROJECT_ID: process.env.VITE_APPWRITE_PROJECT_ID,
+        VITE_APPWRITE_API_KEY: process.env.VITE_APPWRITE_API_KEY,
+        VITE_INSTRUMENTATION_SCRIPT_SRC: process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+      },
+    },
+    {
+      name: 'start',
+      cwd: '/app',
+      script: 'bun run start',
       exec_mode: 'fork',
       instances: 1,
       autorestart: true,
