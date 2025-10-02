@@ -17,6 +17,7 @@ module.exports = {
         VITE_APPWRITE_API_KEY: process.env.VITE_APPWRITE_API_KEY,
         VITE_INSTRUMENTATION_SCRIPT_SRC:
           process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
+        DISABLE_HMR: 'true',
       },
     },
     {
