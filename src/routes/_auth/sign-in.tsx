@@ -42,11 +42,9 @@ function SignInPage() {
     mutationFn: async (data: z.infer<typeof signInSchema>) => {
       const { email, password } = data
       await signIn({
-        data: {
-          email,
-          password,
-          redirect: search.redirect,
-        },
+        email,
+        password,
+        redirect: search.redirect || '/',
       })
     },
     onError: (error: Error) => {

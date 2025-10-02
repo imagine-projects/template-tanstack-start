@@ -66,8 +66,3 @@ export async function createAdminClient() {
     account: new Account(client),
   }
 }
-
-// export const setSessionCookie = createServerFn().handler(async (ctx) => {
-//   const body = await ctx.body;
-//   setCookie("appwrite-session", body.session);
-// })

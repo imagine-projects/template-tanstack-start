@@ -42,11 +42,9 @@ function SignUpPage() {
     mutationFn: async (data: z.infer<typeof signUpSchema>) => {
       const { email, password } = data
       await signUp({
-        data: {
-          email,
-          password,
-          redirect: search.redirect,
-        },
+        email,
+        password,
+        redirect: search.redirect || '/',
       })
     },
     onError: (error: Error) => {

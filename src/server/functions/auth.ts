@@ -5,7 +5,7 @@ import {
   getCurrentUser,
 } from '@/server/appwrite'
 import { redirect } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
+import { createServerOnlyFn } from '@tanstack/react-start'
 import {
   deleteCookie,
   getCookie,
@@ -22,7 +22,7 @@ const signUpInSchema = z.object({
   redirect: z.string().optional(),
 })
 
-export const getAppwriteSession = createServerFn().handler(async () => {
+export const getAppwriteSession = createServerOnlyFn(async () => {
   const session = getCookie(`appwrite-session-secret`)
 
   if (!session) {
@@ -32,26 +32,42 @@ export const getAppwriteSession = createServerFn().handler(async () => {
   return session
 })
 
-export const setSessionCookies = createServerFn({ method: 'POST' })
-  .inputValidator(
-    z.object({
-      id: z.string(),
-      secret: z.string(),
-    }),
-  )
-  .handler(async (ctx) => {
-    setCookie(`appwrite-session-secret`, ctx.data.secret, {
+export const setSessionCookies = createServerOnlyFn(
+  async ({ id, secret }: { id: string; secret: string }) => {
+    setCookie(`appwrite-session-secret`, secret, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
     })
 
-    setCookie(`appwrite-session-id`, ctx.data.id, {
+    setCookie(`appwrite-session-id`, id, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
     })
-  })
+  },
+)
+
+// export const setSessionCookies = createServerFn({ method: 'POST' })
+//   .inputValidator(
+//     z.object({
+//       id: z.string(),
+//       secret: z.string(),
+//     }),
+//   )
+//   .handler(async (ctx) => {
+//     setCookie(`appwrite-session-secret`, ctx.data.secret, {
+//       httpOnly: true,
+//       secure: true,
+//       sameSite: 'none',
+//     })
+
+//     setCookie(`appwrite-session-id`, ctx.data.id, {
+//       httpOnly: true,
+//       secure: true,
+//       sameSite: 'none',
+//     })
+//   })
 
 async function signIn({
   email,
@@ -66,13 +82,15 @@ async function signIn({
     password,
   })
 
-  setSessionCookies({ data: { id: session.$id, secret: session.secret } })
+  setSessionCookies({ id: session.$id, secret: session.secret })
 }
 
-export const signUpFn = createServerFn({ method: 'POST' })
-  .inputValidator(signUpInSchema)
-  .handler(async (ctx) => {
-    const { email, password } = ctx.data
+
+export const signUpFn = createServerOnlyFn(async ({ email, password, redirect: redirectUrl }: { email: string, password: string, redirect: string }) => {
+// export const signUpFn = createServerOnlyFn({ method: 'POST' })
+  // .inputValidator(signUpInSchema)
+  // .handler(async (ctx) => {
+    // const { email, password } = ctx.data
     const { account } = await createAdminClient()
 
     try {
@@ -87,17 +105,19 @@ export const signUpFn = createServerFn({ method: 'POST' })
       }
     }
 
-    if (ctx.data.redirect) {
-      throw redirect({ to: ctx.data.redirect })
+    if (redirectUrl) {
+      throw redirect({ to: redirectUrl })
     } else {
       throw redirect({ to: '/' })
     }
   })
 
-export const signInFn = createServerFn({ method: 'POST' })
-  .inputValidator(signUpInSchema)
-  .handler(async (ctx) => {
-    const { email, password } = ctx.data
+export const signInFn = createServerOnlyFn(async ({ email, password, redirect: redirectUrl }: { email: string, password: string, redirect: string }) => {
+
+// export const signInFn = createServerOnlyFn({ method: 'POST' })
+  // .inputValidator(signUpInSchema)
+  // .handler(async (ctx) => {
+    // const { email, password } = ctx.data
 
     try {
       await signIn({ email, password })
@@ -110,14 +130,14 @@ export const signInFn = createServerFn({ method: 'POST' })
       }
     }
 
-    if (ctx.data.redirect) {
-      throw redirect({ to: ctx.data.redirect })
+    if (redirectUrl) {
+      throw redirect({ to: redirectUrl })
     } else {
       throw redirect({ to: '/' })
     }
   })
 
-export const signOutFn = createServerFn().handler(async () => {
+export const signOutFn = createServerOnlyFn(async () => {
   const session = getCookie(`appwrite-session-secret`)
 
   if (session) {
@@ -130,8 +150,8 @@ export const signOutFn = createServerFn().handler(async () => {
   throw redirect({ to: '/' })
 })
 
-export const authMiddleware = createServerFn().handler(async () => {
-  const currentUser = await getCurrentUser();
+export const authMiddleware = createServerOnlyFn(async () => {
+  const currentUser = await getCurrentUser()
 
   if (currentUser) {
     return {
