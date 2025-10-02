@@ -1,13 +1,12 @@
-import { createSessionClient } from '@/server/appwrite'
 import { redirect } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
-import { getAppwriteSession } from '@/server/functions/auth'
+import { authMiddleware } from '@/server/functions/auth'
 
 export const Route = createFileRoute('/_protected')({
   loader: async ({ location }) => {
-    const session = await getAppwriteSession()
+    const { currentUser } = await authMiddleware()
 
-    if (!session) {
+    if (!currentUser) {
       if (
         location.pathname !== '/sign-in' &&
         location.pathname !== '/sign-up'
@@ -15,9 +14,6 @@ export const Route = createFileRoute('/_protected')({
         throw redirect({ to: '/sign-in', search: { redirect: location.href } })
       }
     }
-
-    const client = await createSessionClient(session!)
-    const currentUser = await client.account.get()
 
     return {
       currentUser,

@@ -3,17 +3,12 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
-import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
-import { getCurrentUser } from '@/server/appwrite'
 import { ThemeProvider } from 'next-themes'
+import { authMiddleware } from '@/server/functions/auth'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -27,13 +22,13 @@ const scripts: React.DetailedHTMLProps<
 if (import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC) {
   scripts.push({
     src: import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
-    type: "module"
+    type: 'module',
   })
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   loader: async () => {
-    const currentUser = await getCurrentUser()
+    const { currentUser } = await authMiddleware()
 
     return {
       currentUser,

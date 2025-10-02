@@ -9,13 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PublicRouteImport } from './routes/_public'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as ProtectedExampleProtectedRouteRouteImport } from './routes/_protected/example-protected-route'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthSignOutRouteImport } from './routes/_auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
@@ -25,9 +31,9 @@ const AuthRoute = AuthRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicIndexRoute = PublicIndexRouteImport.update({
-  id: '/_public/',
+  id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => PublicRoute,
 } as any)
 const ProtectedExampleProtectedRouteRoute =
   ProtectedExampleProtectedRouteRouteImport.update({
@@ -40,6 +46,11 @@ const AuthSignUpRoute = AuthSignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSignOutRoute = AuthSignOutRouteImport.update({
+  id: '/sign-out',
+  path: '/sign-out',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
@@ -48,12 +59,14 @@ const AuthSignInRoute = AuthSignInRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/sign-in': typeof AuthSignInRoute
+  '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
   '/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/': typeof PublicIndexRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof AuthSignInRoute
+  '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
   '/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/': typeof PublicIndexRoute
@@ -62,21 +75,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
+  '/_public': typeof PublicRouteWithChildren
   '/_auth/sign-in': typeof AuthSignInRoute
+  '/_auth/sign-out': typeof AuthSignOutRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_protected/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/_public/': typeof PublicIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/sign-in' | '/sign-up' | '/example-protected-route' | '/'
+  fullPaths:
+    | '/sign-in'
+    | '/sign-out'
+    | '/sign-up'
+    | '/example-protected-route'
+    | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/sign-in' | '/sign-up' | '/example-protected-route' | '/'
+  to: '/sign-in' | '/sign-out' | '/sign-up' | '/example-protected-route' | '/'
   id:
     | '__root__'
     | '/_auth'
     | '/_protected'
+    | '/_public'
     | '/_auth/sign-in'
+    | '/_auth/sign-out'
     | '/_auth/sign-up'
     | '/_protected/example-protected-route'
     | '/_public/'
@@ -85,11 +107,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   ProtectedRoute: typeof ProtectedRouteWithChildren
-  PublicIndexRoute: typeof PublicIndexRoute
+  PublicRoute: typeof PublicRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -109,7 +138,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof PublicIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_protected/example-protected-route': {
       id: '/_protected/example-protected-route'
@@ -125,6 +154,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignUpRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/sign-out': {
+      id: '/_auth/sign-out'
+      path: '/sign-out'
+      fullPath: '/sign-out'
+      preLoaderRoute: typeof AuthSignOutRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sign-in': {
       id: '/_auth/sign-in'
       path: '/sign-in'
@@ -137,11 +173,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignOutRoute: typeof AuthSignOutRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
+  AuthSignOutRoute: AuthSignOutRoute,
   AuthSignUpRoute: AuthSignUpRoute,
 }
 
@@ -159,10 +197,21 @@ const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
   ProtectedRouteChildren,
 )
 
+interface PublicRouteChildren {
+  PublicIndexRoute: typeof PublicIndexRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicIndexRoute: PublicIndexRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   ProtectedRoute: ProtectedRouteWithChildren,
-  PublicIndexRoute: PublicIndexRoute,
+  PublicRoute: PublicRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

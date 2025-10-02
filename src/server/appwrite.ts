@@ -3,7 +3,7 @@
  * These should only be imported in server-side actions (SSR, functions).
  */
 
-import { Client, Account } from 'node-appwrite'
+import { Client, Account, Models, Storage, Users } from 'node-appwrite'
 import { getAppwriteSession } from './functions/auth'
 
 const getAppwriteClientCredentials = () => {
@@ -29,7 +29,7 @@ const getAppwriteClientCredentials = () => {
   }
 }
 
-export async function getCurrentUser() {
+export async function getCurrentUser(): Promise<Models.User | null> {
   const session = await getAppwriteSession()
 
   if (!session) {
@@ -44,13 +44,13 @@ export async function getCurrentUser() {
 export async function createSessionClient(session: string) {
   const { endpoint, projectId } = getAppwriteClientCredentials()
   const client = new Client().setEndpoint(endpoint).setProject(projectId)
-
   client.setSession(session)
 
   return {
-    get account() {
-      return new Account(client)
-    },
+    client: client,
+    account: new Account(client),
+    users: new Users(client),
+    storage: new Storage(client),
   }
 }
 
@@ -62,9 +62,8 @@ export async function createAdminClient() {
     .setKey(apiKey)
 
   return {
-    get account() {
-      return new Account(client)
-    },
+    client: client,
+    account: new Account(client),
   }
 }
 

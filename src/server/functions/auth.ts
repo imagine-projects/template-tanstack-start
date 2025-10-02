@@ -1,9 +1,15 @@
-import { createAdminClient, createSessionClient } from '@/server/appwrite'
+import { handleEmbeddedPreview } from '@/.imagine/imagine-preview-token'
+import {
+  createAdminClient,
+  createSessionClient,
+  getCurrentUser,
+} from '@/server/appwrite'
 import { redirect } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import {
   deleteCookie,
   getCookie,
+  getRequest,
   setCookie,
   setResponseStatus,
 } from '@tanstack/react-start/server'
@@ -11,13 +17,13 @@ import { AppwriteException, ID } from 'node-appwrite'
 import z from 'zod'
 
 const signUpInSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   redirect: z.string().optional(),
 })
 
 export const getAppwriteSession = createServerFn().handler(async () => {
-  const session = getCookie('appwrite-session-secret')
+  const session = getCookie(`appwrite-session-secret`)
 
   if (!session) {
     return null
@@ -25,6 +31,27 @@ export const getAppwriteSession = createServerFn().handler(async () => {
 
   return session
 })
+
+export const setSessionCookies = createServerFn({ method: 'POST' })
+  .inputValidator(
+    z.object({
+      id: z.string(),
+      secret: z.string(),
+    }),
+  )
+  .handler(async (ctx) => {
+    setCookie(`appwrite-session-secret`, ctx.data.secret, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    })
+
+    setCookie(`appwrite-session-id`, ctx.data.id, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    })
+  })
 
 async function signIn({
   email,
@@ -34,25 +61,12 @@ async function signIn({
   password: string
 }) {
   const { account } = await createAdminClient()
-
   const session = await account.createEmailPasswordSession({
     email,
     password,
   })
 
-  setCookie('appwrite-session-secret', session.secret, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    path: '/',
-  })
-
-  setCookie('appwrite-session-id', session.userId, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'none',
-    path: '/',
-  })
+  setSessionCookies({ data: { id: session.$id, secret: session.secret } })
 }
 
 export const signUpFn = createServerFn({ method: 'POST' })
@@ -104,14 +118,38 @@ export const signInFn = createServerFn({ method: 'POST' })
   })
 
 export const signOutFn = createServerFn().handler(async () => {
-  const session = getCookie('appwrite-session-secret')
+  const session = getCookie(`appwrite-session-secret`)
 
   if (session) {
     const { account } = await createSessionClient(session)
     await account.deleteSession({ sessionId: 'current' })
-    deleteCookie('appwrite-session-secret')
-    deleteCookie('appwrite-session-id')
+    deleteCookie(`appwrite-session-secret`)
+    deleteCookie(`appwrite-session-id`)
   }
 
-  throw redirect({ to: '/sign-in' })
+  throw redirect({ to: '/' })
+})
+
+export const authMiddleware = createServerFn().handler(async () => {
+  const currentUser = await getCurrentUser();
+
+  if (currentUser) {
+    return {
+      currentUser,
+    }
+  }
+
+  const request = getRequest()
+  const imaginePreviewToken = request.headers.get('x-imagine-preview-token')
+
+  if (imaginePreviewToken) {
+    const previewUser = await handleEmbeddedPreview(imaginePreviewToken)
+    return {
+      currentUser: previewUser,
+    }
+  }
+
+  return {
+    currentUser: null,
+  }
 })
