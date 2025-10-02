@@ -13,8 +13,6 @@ export const doSomethingFn = createServerFn({
   .handler(async ({ data }) => {
     const { currentUser } = await authMiddleware()
 
-    console.log('currentUser', currentUser)
-
     if (!currentUser) {
       throw new Error('Unauthorized')
     }
