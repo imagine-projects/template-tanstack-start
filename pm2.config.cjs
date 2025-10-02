@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: 'devserver',
-      cwd: '/workspace/app',
+      cwd: '/app',
       script: 'bun run dev',
       exec_mode: 'fork',
       instances: 1,
