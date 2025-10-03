@@ -16,7 +16,7 @@ const getAppwriteClientCredentials = () => {
     throw new Error('APPWRITE_PROJECT_ID is not set')
   }
 
-  const apiKey = import.meta.env.APPWRITE_API_KEY
+  const apiKey = process.env.APPWRITE_API_KEY
   if (!apiKey) {
     throw new Error('APPWRITE_API_KEY is not set')
   }
