@@ -11,9 +11,9 @@ const getAppwriteClientCredentials = () => {
     throw new Error('APPWRITE_ENDPOINT is not set')
   }
 
-  const projectId = process.env.VITE_APPWRITE_PROJECT_ID
+  const projectId = process.env.APPWRITE_PROJECT_ID
   if (!projectId) {
-    throw new Error('VITE_APPWRITE_PROJECT_ID is not set')
+    throw new Error('APPWRITE_PROJECT_ID is not set')
   }
 
   const apiKey = import.meta.env.APPWRITE_API_KEY

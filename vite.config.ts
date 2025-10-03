@@ -19,7 +19,7 @@ const config = defineConfig({
   server: {
     host: '::',
     allowedHosts: true,
-    hmr: true
+    hmr: true,
   },
 })
 

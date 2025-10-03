@@ -13,7 +13,7 @@ module.exports = {
       env: {
         PORT: '3000',
         APPWRITE_ENDPOINT: process.env.APPWRITE_ENDPOINT,
-        VITE_APPWRITE_PROJECT_ID: process.env.VITE_APPWRITE_PROJECT_ID,
+        APPWRITE_PROJECT_ID: process.env.APPWRITE_PROJECT_ID,
         APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
         VITE_INSTRUMENTATION_SCRIPT_SRC:
           process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
@@ -32,7 +32,7 @@ module.exports = {
       env: {
         PORT: '3000',
         VITE_APPWRITE_ENDPOINT: process.env.VITE_APPWRITE_ENDPOINT,
-        VITE_APPWRITE_PROJECT_ID: process.env.VITE_APPWRITE_PROJECT_ID,
+        APPWRITE_PROJECT_ID: process.env.APPWRITE_PROJECT_ID,
         VITE_APPWRITE_API_KEY: process.env.VITE_APPWRITE_API_KEY,
         VITE_INSTRUMENTATION_SCRIPT_SRC:
           process.env.VITE_INSTRUMENTATION_SCRIPT_SRC,
