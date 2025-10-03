@@ -108,14 +108,7 @@ export const signInFn = createServerFn({ method: 'POST' })
 
 export const signOutFn = createServerFn({ method: 'POST' }).handler(
   async () => {
-    const session = await getAppwriteSessionFn()
-
-    if (session) {
-      const { account } = await createSessionClient(session)
-      await account.deleteSession({ sessionId: 'current' })
-      deleteCookie(`appwrite-session-secret`)
-    }
-
+    deleteCookie(`appwrite-session-secret`)
     throw redirect({ to: '/' })
   },
 )

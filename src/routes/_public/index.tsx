@@ -1,5 +1,4 @@
 import { ImaginePlaceholder } from '@/components/imagine-placeholder'
-import { ClientOnly } from '@/components/client-only'
 import { createFileRoute, useLoaderData } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { useServerFn } from '@tanstack/react-start'
@@ -28,14 +27,12 @@ function Index() {
 
   return (
     <div className="min-h-screen flex flex-col p-8">
-      <ClientOnly fallback={<div className="min-h-screen" />}>
-        <ImaginePlaceholder />
-        <div>
-          <Button onClick={handleSomething}>Do something</Button>
-          <div>String: {str}</div>
-          <div>Preloaded data: {preloadedData}</div>
-        </div>
-      </ClientOnly>
+      <ImaginePlaceholder />
+      <div>
+        <Button onClick={handleSomething}>Do something</Button>
+        <div>String: {str}</div>
+        <div>Preloaded data: {preloadedData}</div>
+      </div>
     </div>
   )
 }

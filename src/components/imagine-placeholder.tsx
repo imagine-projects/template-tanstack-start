@@ -1,4 +1,4 @@
-import { Link, useLoaderData } from '@tanstack/react-router'
+import { Link, useLoaderData, useLocation } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
 import { useServerFn } from '@tanstack/react-start'
@@ -7,6 +7,7 @@ import { signOutFn } from '@/server/functions/auth'
 export function ImaginePlaceholder() {
   const { currentUser } = useLoaderData({ from: '/_public' })
   const signOut = useServerFn(signOutFn)
+  const location = useLocation()
   const { theme } = useTheme()
 
   return (
