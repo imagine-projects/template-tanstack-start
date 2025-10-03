@@ -49,7 +49,7 @@ export const signUpFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
     const { email, password, redirect: redirectUrl } = data
-    const { account } = await createAdminClient()
+    const { account } = createAdminClient()
 
     try {
       await account.create({ userId: ID.unique(), email, password })
@@ -82,7 +82,7 @@ export const signInFn = createServerFn({ method: 'POST' })
     const { email, password, redirect: redirectUrl } = data
 
     try {
-      const { account } = await createAdminClient()
+      const { account } = createAdminClient()
       const session = await account.createEmailPasswordSession({
         email,
         password,
