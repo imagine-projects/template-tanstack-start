@@ -23,8 +23,6 @@ export function ImaginePlaceholder() {
         className="size-14"
       />
 
-      <div>Appwrite Project ID: {import.meta.env.VITE_APPWRITE_PROJECT_ID}</div>
-
       {currentUser ? (
         <>
           <p className="text-foreground/70">

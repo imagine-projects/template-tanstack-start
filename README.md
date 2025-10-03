@@ -9,6 +9,18 @@ bun install
 bunx --bun run start
 ```
 
+## Environment Variables
+
+Copy `.env.example` to `.env` before running the app and provide values for the required secrets:
+
+- `APPWRITE_ENDPOINT` – Base URL of your Appwrite instance.
+- `APPWRITE_API_KEY` – API key with permissions for the configured project.
+- `APPWRITE_BUCKET_ID` – Identifier of the storage bucket used by the app.
+- `APPWRITE_PROJECT_ID` – Appwrite project ID exposed to the client build.
+- `VITE_INSTRUMENTATION_SCRIPT_SRC` – Script URL injected for analytics/instrumentation.
+
+The app will fail to authenticate or access storage until these values are set.
+
 # Building For Production
 
 To build this application for production:

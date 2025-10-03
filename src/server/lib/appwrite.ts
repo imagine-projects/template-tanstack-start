@@ -6,19 +6,19 @@
 import { Client, Account, Storage, Users } from 'node-appwrite'
 
 const getAppwriteClientCredentials = () => {
-  const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT
+  const endpoint = process.env.APPWRITE_ENDPOINT
   if (!endpoint) {
-    throw new Error('VITE_APPWRITE_ENDPOINT is not set')
+    throw new Error('APPWRITE_ENDPOINT is not set')
   }
 
-  const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID
+  const projectId = process.env.APPWRITE_PROJECT_ID
   if (!projectId) {
-    throw new Error('VITE_APPWRITE_PROJECT_ID is not set')
+    throw new Error('APPWRITE_PROJECT_ID is not set')
   }
 
-  const apiKey = import.meta.env.VITE_APPWRITE_API_KEY
+  const apiKey = process.env.APPWRITE_API_KEY
   if (!apiKey) {
-    throw new Error('VITE_APPWRITE_API_KEY is not set')
+    throw new Error('APPWRITE_API_KEY is not set')
   }
 
   return {
@@ -41,7 +41,10 @@ export async function createSessionClient(session: string) {
   }
 }
 
-export async function createAdminClient() {
+export function createAdminClient(): {
+  client: Client
+  account: Account
+} {
   const { endpoint, projectId, apiKey } = getAppwriteClientCredentials()
   const client = new Client()
     .setEndpoint(endpoint)
