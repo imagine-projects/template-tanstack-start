@@ -19,7 +19,7 @@ const config = defineConfig({
   server: {
     host: '::',
     allowedHosts: true,
-    hmr: process.env.DISABLE_HMR === 'true' ? false : true,
+    hmr: true
   },
 })
 
