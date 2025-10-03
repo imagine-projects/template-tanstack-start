@@ -6,11 +6,9 @@ import { AppwriteException, ID } from 'node-appwrite'
 import {
   deleteCookie,
   getCookie,
-  getRequest,
   setCookie,
   setResponseStatus,
 } from '@tanstack/react-start/server'
-import { handleEmbeddedPreview } from '@/server/lib/imagine-preview-token-utils'
 
 export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -116,7 +114,6 @@ export const signOutFn = createServerFn({ method: 'POST' }).handler(
       const { account } = await createSessionClient(session)
       await account.deleteSession({ sessionId: 'current' })
       deleteCookie(`appwrite-session-secret`)
-      deleteCookie(`appwrite-session-id`)
     }
 
     throw redirect({ to: '/' })
@@ -127,24 +124,8 @@ export const authMiddleware = createServerFn({ method: 'GET' }).handler(
   async () => {
     const currentUser = await getCurrentUser()
 
-    if (currentUser) {
-      return {
-        currentUser,
-      }
-    }
-
-    const request = getRequest()
-    const imaginePreviewToken = request.headers.get('x-imagine-preview-token')
-
-    if (imaginePreviewToken) {
-      const previewUser = await handleEmbeddedPreview(imaginePreviewToken)
-      return {
-        currentUser: previewUser,
-      }
-    }
-
     return {
-      currentUser: null,
+      currentUser,
     }
   },
 )
