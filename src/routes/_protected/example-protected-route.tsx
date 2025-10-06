@@ -6,6 +6,6 @@ export const Route = createFileRoute('/_protected/example-protected-route')({
 })
 
 function RouteComponent({}) {
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuth()
   return <div>Protected {currentUser?.email}</div>
 }

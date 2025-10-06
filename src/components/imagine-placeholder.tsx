@@ -6,7 +6,7 @@ import { signOutFn } from '@/server/functions/auth'
 import { useAuth } from '@/hooks/use-auth'
 
 export function ImaginePlaceholder() {
-  const { currentUser } = useAuth();
+  const { currentUser } = useAuth()
   const signOut = useServerFn(signOutFn)
   const location = useLocation()
   const { theme } = useTheme()
