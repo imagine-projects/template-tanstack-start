@@ -67,7 +67,7 @@
       },
       "devDependencies": {
         "@tanstack/eslint-config": "^0.3.0",
-        "@tanstack/nitro-v2-vite-plugin": "^1.132.21",
+        "@tanstack/nitro-v2-vite-plugin": "^1.132.40",
         "@tanstack/router-cli": "^1.132.21",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.2.0",
@@ -572,7 +572,7 @@
 
     "@tanstack/history": ["@tanstack/history@1.132.31", "", {}, "sha512-UCHM2uS0t/uSszqPEo+SBSSoQVeQ+LlOWAVBl5SA7+AedeAbKafIPjFn8huZCXNLAYb0WKV2+wETr7lDK9uz7g=="],
 
-    "@tanstack/nitro-v2-vite-plugin": ["@tanstack/nitro-v2-vite-plugin@1.132.21", "", { "dependencies": { "nitropack": "^2.12.6", "pathe": "^2.0.3" }, "peerDependencies": { "vite": ">=7.0.0" } }, "sha512-oshVQ79x/e6HaKhKFDoWG0WlEm65/BnegiWMFWrpjx23zZ576nVaLCTfAitlOGGdd0zgutnfalui7lfLsruZKQ=="],
+    "@tanstack/nitro-v2-vite-plugin": ["@tanstack/nitro-v2-vite-plugin@1.132.40", "", { "dependencies": { "nitropack": "^2.12.6", "pathe": "^2.0.3" }, "peerDependencies": { "vite": ">=7.0.0" } }, "sha512-C+KHjNmQaCN5DfM1pBVIF34kvw92VnAzkpxiX83V1L/jQx4eHiTk9Ur5XcGEiT/lDeSQ/+CTzefsMvBCf74pcQ=="],
 
     "@tanstack/query-core": ["@tanstack/query-core@5.90.2", "", {}, "sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ=="],
 
