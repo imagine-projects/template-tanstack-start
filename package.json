@@ -88,7 +88,7 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "jsdom": "^26.0.0",
-    "nitro-nightly": "^3.0.0-20250929-230949-292a03ea",
+    "nitro": "npm:nitro-nightly@3.0.0-20251007-195302-077e6124",
     "prettier": "^3.5.3",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
