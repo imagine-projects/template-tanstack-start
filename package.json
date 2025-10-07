@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "start": "bun run server.ts",
-    "build": "vite build",
+    "build": "vite build --sourcemap",
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
