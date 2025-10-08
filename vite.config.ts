@@ -16,7 +16,7 @@ const config = defineConfig({
     tanstackStart(),
     nitro({
       config: {
-        preset: 'node-server',
+        preset: 'bun',
       },
     }),
     devtoolsJson(),
