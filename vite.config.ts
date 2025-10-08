@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 import devtoolsJson from 'vite-plugin-devtools-json'
 import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin'
 
+const forSites = process.env?.FOR_SITES === 'true';
+
 const config = defineConfig({
   plugins: [
     // this is the plugin that enables path aliases
@@ -16,7 +18,7 @@ const config = defineConfig({
     tanstackStart(),
     nitroV2Plugin({
       compatibilityDate: '2025-10-08',
-      preset: 'node',
+      preset: forSites ? 'node' : 'bun',
     }),
     devtoolsJson(),
     viteReact(),
