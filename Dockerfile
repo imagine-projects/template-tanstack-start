@@ -15,6 +15,7 @@ RUN bun install --frozen-lockfile
 WORKDIR /app
 RUN git init
 RUN cp -r /template/node_modules /app/node_modules
+RUN rm -rf /template/node_modules
 
 WORKDIR /turborepo
 ENV FS_ROOT_PATH=/app
