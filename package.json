@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "start": "bun run .output/server/index.mjs",
+    "start": "bun run server.ts",
     "build": "vite build --sourcemap",
     "build:node": "FOR_SITES=true vite build",
     "serve": "vite preview",
