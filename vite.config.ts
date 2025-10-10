@@ -16,9 +16,9 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    nitroV2Plugin({
+    forSites && nitroV2Plugin({
       compatibilityDate: '2025-10-08',
-      preset: forSites ? 'node' : 'bun',
+      preset: 'node'
     }),
     devtoolsJson(),
     viteReact(),
