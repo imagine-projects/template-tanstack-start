@@ -1,4 +1,4 @@
-FROM appwrite/synapse-server:latest AS base
+FROM appwrite/imagine-synapse-server:latest AS base
 RUN apt-get update && apt-get install -y git
 RUN npm install -g pnpm pm2
 RUN apt-get update && apt-get install -y lsof
@@ -17,6 +17,5 @@ RUN git init
 RUN cp -r /template/node_modules /app/node_modules
 RUN rm -rf /template/node_modules
 
-WORKDIR /turborepo
+WORKDIR /usr/src/synapse
 ENV FS_ROOT_PATH=/app
-

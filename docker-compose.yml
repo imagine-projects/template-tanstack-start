@@ -1,6 +1,6 @@
 services:
   imagine-sandbox-template-tanstack-start:
-    image: appwrite/imagine-sandbox-template-tanstack-start:v3
+    image: appwrite/imagine-sandbox-template-tanstack-start:latest
     platform: linux/amd64
     build:
       context: .
