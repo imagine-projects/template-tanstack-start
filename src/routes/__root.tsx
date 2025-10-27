@@ -49,14 +49,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         property: "og:description",
-        content: "Imagine App is a platform for creating and sharing images.",
+        content: "Imagine is a platform for building software using only a chat interface.",
       },
       {
         title: 'Imagine App',
       },
       {
         name: "description",
-        content: "Imagine App is a platform for creating and sharing images.",
+        content: "Imagine is a platform for building software using only a chat interface.",
       }
     ],
     links: [
