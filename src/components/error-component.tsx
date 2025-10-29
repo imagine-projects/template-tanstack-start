@@ -2,6 +2,7 @@ import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
 import { SparklesIcon } from 'lucide-react'
 import { useLocation } from '@tanstack/react-router'
+import { useEffect, useRef } from 'react'
 
 export function ErrorComponent({
   error,
@@ -11,33 +12,37 @@ export function ErrorComponent({
   info?: { componentStack: string }
   reset: () => void
 }) {
+  const randomErrorId = useRef<string>(
+    Math.random().toString(36).substring(2, 15),
+  )
   const { theme } = useTheme()
   const location = useLocation()
 
-  const handleFix = () => {
-    const data = {
-      href: location.href,
-      errorMessage: error.message,
-      errorStack: error.stack,
-      errorCause: error.cause,
-      errorComponentStack: info?.componentStack,
-    }
+  const data = {
+    errorId: randomErrorId.current,
+    href: location.href,
+    errorMessage: error.message,
+    errorStack: error.stack,
+    errorCause: error.cause,
+    errorComponentStack: info?.componentStack,
+  };
 
-    // Post message to parent
-    window.parent.postMessage(
-      {
-        type: 'fix-error',
+  // Every 1 second, notify parent that an error exists
+  useEffect(() => {
+    const interval = setInterval(() => {
+      window.parent.postMessage({
+        type: 'notify-error',
         data,
-      },
-      '*',
-    ) as unknown as MessageEvent
+      })
 
-    const fixErrorsFn = (window as any)?.imagineFixError
+      const notifyErrorFn = (window as any)?.imagineFixError
+      if (notifyErrorFn) {
+        notifyErrorFn(data)
+      }
+    }, 1000)
 
-    if (fixErrorsFn) {
-      fixErrorsFn(data)
-    }
-  }
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="flex-grow flex flex-col justify-center items-center gap-6 text-center my-20">
@@ -59,7 +64,7 @@ export function ErrorComponent({
         </pre>
       </div>
 
-      <Button onClick={handleFix} className="cursor-pointer">
+      <Button className="cursor-pointer">
         <SparklesIcon />
         Fix it!
       </Button>
