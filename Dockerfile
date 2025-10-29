@@ -1,21 +1,13 @@
-FROM appwrite/imagine-synapse-server:latest AS base
-RUN apt-get update && apt-get install -y git
-RUN npm install -g pnpm pm2
-RUN apt-get update && apt-get install -y lsof
-RUN apt-get install -y curl
-
-RUN mkdir -p /app
-
+FROM node:22-slim AS template
+RUN npm install -g bun
 WORKDIR /template
-COPY pm2.config.cjs ./
-
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
+FROM appwrite/imagine-synapse-server:latest AS base
 WORKDIR /app
 RUN git init
-RUN cp -r /template/node_modules /app/node_modules
-RUN rm -rf /template/node_modules
+COPY --from=template /template/node_modules /app/node_modules
 
 WORKDIR /usr/src/synapse
 ENV FS_ROOT_PATH=/app
