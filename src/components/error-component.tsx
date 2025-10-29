@@ -63,11 +63,6 @@ export function ErrorComponent({
           {error.message ? <code>{error.message}</code> : null}
         </pre>
       </div>
-
-      <Button className="cursor-pointer">
-        <SparklesIcon />
-        Fix it!
-      </Button>
     </div>
   )
 }
