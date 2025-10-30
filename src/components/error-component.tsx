@@ -1,6 +1,4 @@
 import { useTheme } from 'next-themes'
-import { Button } from './ui/button'
-import { SparklesIcon } from 'lucide-react'
 import { useLocation } from '@tanstack/react-router'
 import { useEffect, useRef } from 'react'
 
@@ -18,28 +16,23 @@ export function ErrorComponent({
   const { theme } = useTheme()
   const location = useLocation()
 
-  const data = {
-    errorId: randomErrorId.current,
-    href: location.href,
-    errorMessage: error.message,
-    errorStack: error.stack,
-    errorCause: error.cause,
-    errorComponentStack: info?.componentStack,
-  };
+  const message = {
+    type: 'NOTIFY_ERROR',
+    data: {
+      errorId: randomErrorId.current,
+      href: location.href,
+      errorMessage: error.message,
+      errorStack: error.stack,
+      errorCause: error.cause,
+      errorComponentStack: info?.componentStack,
+    }
+  }
 
   // Every 1 second, notify parent that an error exists
   useEffect(() => {
     const interval = setInterval(() => {
-      window.parent.postMessage({
-        type: 'notify-error',
-        data,
-      })
-
-      const notifyErrorFn = (window as any)?.imagineFixError
-      if (notifyErrorFn) {
-        notifyErrorFn(data)
-      }
-    }, 1000)
+      window.parent.postMessage(message)
+    }, 2000);
 
     return () => clearInterval(interval)
   }, [])
