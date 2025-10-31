@@ -3,7 +3,6 @@ import { authMiddleware } from '@/server/functions/auth'
 
 export const Route = createFileRoute('/_public')({
   loader: async () => {
-    throw new Error("This was put here by mistake, oops!");
     const { currentUser } = await authMiddleware()
 
     return {
