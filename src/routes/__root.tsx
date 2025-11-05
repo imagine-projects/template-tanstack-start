@@ -44,8 +44,20 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
+        property: "og:title",
+        content: "Imagine App",
+      },
+      {
+        property: "og:description",
+        content: "Imagine is a platform for building software using only a chat interface.",
+      },
+      {
         title: 'Imagine App',
       },
+      {
+        name: "description",
+        content: "Imagine is a platform for building software using only a chat interface.",
+      }
     ],
     links: [
       {
