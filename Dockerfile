@@ -4,10 +4,10 @@ WORKDIR /template
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-FROM appwrite/imagine-synapse-server:latest AS base
+FROM appwrite/imagine-sandy-server:latest AS base
 WORKDIR /app
 RUN git init
 COPY --from=template /template/node_modules /app/node_modules
 
-WORKDIR /usr/src/synapse
+WORKDIR /usr/src/sandy
 ENV FS_ROOT_PATH=/app
