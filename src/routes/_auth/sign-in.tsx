@@ -3,12 +3,19 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useRouter,
+  useSearch,
+} from '@tanstack/react-router'
 import { z } from 'zod'
 import { AuthCard } from '@/components/auth/auth-card'
 import { AuthForm } from '@/components/auth/auth-form'
 import { AuthField } from '@/components/auth/auth-field'
 import { signInFn } from '@/server/functions/auth'
+import { useServerFn } from '@tanstack/react-start'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -28,6 +35,9 @@ const signInSchema = z.object({
 
 function SignInPage() {
   const search = useSearch({ from: '/_auth/sign-in' })
+  const navigate = useNavigate()
+  const router = useRouter()
+  const signIn = useServerFn(signInFn)
   const form = useForm({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -38,11 +48,32 @@ function SignInPage() {
 
   const signInMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signInSchema>) => {
-      await signInFn({ data })
+      await signIn({
+        data: { ...data, redirect: search.redirect || '/dashboard' },
+      })
     },
-    onError: (error: Error) => {
+    onSuccess: async () => {
+      // Invalidate router to refresh auth state
+      await router.invalidate()
+      // Navigate to the redirect destination
+      navigate({ to: search.redirect || '/dashboard' })
+    },
+    onError: async (error: any) => {
+      // Check if it's a redirect error (TanStack Start throws redirects as errors)
+      if (
+        error?.status === 302 ||
+        error?.redirect ||
+        error?.message?.includes('redirect')
+      ) {
+        // Invalidate router to refresh auth state
+        await router.invalidate()
+        // Navigate to the redirect destination
+        const redirectTo = search.redirect || '/dashboard'
+        navigate({ to: redirectTo })
+        return
+      }
       console.error('Sign in error:', error)
-      form.setError('root', { message: error.message })
+      form.setError('root', { message: error.message || 'Failed to sign in' })
     },
   })
 

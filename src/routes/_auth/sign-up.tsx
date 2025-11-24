@@ -3,7 +3,13 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { createFileRoute, Link, useSearch } from '@tanstack/react-router'
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useRouter,
+  useSearch,
+} from '@tanstack/react-router'
 import { z } from 'zod'
 import { AuthCard } from '@/components/auth/auth-card'
 import { AuthForm } from '@/components/auth/auth-form'
@@ -29,6 +35,8 @@ const signUpSchema = z.object({
 
 function SignUpPage() {
   const search = useSearch({ from: '/_auth/sign-up' })
+  const navigate = useNavigate()
+  const router = useRouter()
   const signUp = useServerFn(signUpFn)
   const form = useForm({
     resolver: zodResolver(signUpSchema),
@@ -40,10 +48,32 @@ function SignUpPage() {
 
   const signUpMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signUpSchema>) => {
-      await signUp({ data })
+      await signUp({
+        data: { ...data, redirect: search.redirect || '/dashboard' },
+      })
     },
-    onError: (error: Error) => {
-      form.setError('root', { message: error.message })
+    onSuccess: async () => {
+      // Invalidate router to refresh auth state
+      await router.invalidate()
+      // Navigate to the redirect destination
+      navigate({ to: search.redirect || '/dashboard' })
+    },
+    onError: async (error: any) => {
+      // Check if it's a redirect error (TanStack Start throws redirects as errors)
+      if (
+        error?.status === 302 ||
+        error?.redirect ||
+        error?.message?.includes('redirect')
+      ) {
+        // Invalidate router to refresh auth state
+        await router.invalidate()
+        // Navigate to the redirect destination
+        const redirectTo = search.redirect || '/dashboard'
+        navigate({ to: redirectTo })
+        return
+      }
+      console.error('Sign up error:', error)
+      form.setError('root', { message: error.message || 'Failed to sign up' })
     },
   })
 
