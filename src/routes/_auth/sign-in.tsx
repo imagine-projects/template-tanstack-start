@@ -49,14 +49,16 @@ function SignInPage() {
   const signInMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signInSchema>) => {
       await signIn({
-        data: { ...data, redirect: search.redirect || '/dashboard' },
+        data: { ...data, redirect: search.redirect },
       })
     },
     onSuccess: async () => {
       // Invalidate router to refresh auth state
       await router.invalidate()
-      // Navigate to the redirect destination
-      navigate({ to: search.redirect || '/dashboard' })
+      // Navigate to the redirect destination if provided
+      if (search.redirect) {
+        navigate({ to: search.redirect })
+      }
     },
     onError: async (error: any) => {
       // Check if it's a redirect error (TanStack Start throws redirects as errors)
@@ -67,9 +69,10 @@ function SignInPage() {
       ) {
         // Invalidate router to refresh auth state
         await router.invalidate()
-        // Navigate to the redirect destination
-        const redirectTo = search.redirect || '/dashboard'
-        navigate({ to: redirectTo })
+        // Navigate to the redirect destination if provided
+        if (search.redirect) {
+          navigate({ to: search.redirect })
+        }
         return
       }
       console.error('Sign in error:', error)
