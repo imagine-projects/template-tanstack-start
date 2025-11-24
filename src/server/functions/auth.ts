@@ -57,7 +57,7 @@ export const signUpFn = createServerFn({ method: 'POST' })
         email,
         password,
       })
-      setAppwriteSessionCookiesFn({
+      await setAppwriteSessionCookiesFn({
         data: { id: session.$id, secret: session.secret },
       })
     } catch (_error) {
@@ -87,7 +87,7 @@ export const signInFn = createServerFn({ method: 'POST' })
         email,
         password,
       })
-      setAppwriteSessionCookiesFn({
+      await setAppwriteSessionCookiesFn({
         data: { id: session.$id, secret: session.secret },
       })
     } catch (_error) {
@@ -109,7 +109,7 @@ export const signInFn = createServerFn({ method: 'POST' })
 export const signOutFn = createServerFn({ method: 'POST' }).handler(
   async () => {
     deleteCookie(`appwrite-session-secret`)
-    throw redirect({ to: '/' })
+    deleteCookie(`appwrite-session-id`)
   },
 )
 
