@@ -16,10 +16,11 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    forSites && nitroV2Plugin({
-      compatibilityDate: '2025-10-08',
-      preset: 'node'
-    }),
+    forSites &&
+      nitroV2Plugin({
+        compatibilityDate: '2025-10-08',
+        preset: 'node',
+      }),
     devtoolsJson(),
     viteReact(),
   ],

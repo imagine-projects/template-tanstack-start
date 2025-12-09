@@ -14,7 +14,9 @@ export const getRouter = () => {
     routeTree,
     context: { ...rqContext },
     defaultPreload: 'intent',
-    defaultErrorComponent: ({ error, info, reset }) => <ErrorComponent error={error} info={info} reset={reset} />,
+    defaultErrorComponent: ({ error, info, reset }) => (
+      <ErrorComponent error={error} info={info} reset={reset} />
+    ),
     Wrap: (props: { children: React.ReactNode }) => {
       return (
         <TanstackQuery.Provider {...rqContext}>

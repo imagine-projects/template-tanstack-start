@@ -25,14 +25,14 @@ export function ErrorComponent({
       errorStack: error.stack,
       errorCause: error.cause,
       errorComponentStack: info?.componentStack,
-    }
+    },
   }
 
   // Every 1 second, notify parent that an error exists
   useEffect(() => {
     const interval = setInterval(() => {
       window.parent.postMessage(message)
-    }, 2000);
+    }, 2000)
 
     return () => clearInterval(interval)
   }, [])
