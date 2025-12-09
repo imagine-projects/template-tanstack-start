@@ -6,8 +6,6 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 
-RUN git remote rename origin template
-
 WORKDIR /usr/src/sandy
 ENV FS_ROOT_PATH=/app
 
