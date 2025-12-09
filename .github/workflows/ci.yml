@@ -49,6 +49,9 @@ jobs:
     name: Dockerize
     runs-on: blacksmith-4vcpu-ubuntu-2404
     needs: ci
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
