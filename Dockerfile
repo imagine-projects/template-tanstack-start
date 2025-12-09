@@ -6,7 +6,14 @@ RUN bun install --frozen-lockfile
 
 COPY . .
 
-WORKDIR /usr/src/sandy`
+# Ensure clean git status, reset any changes
+RUN git reset --hard
+RUN git clean -f -d
+
+# Rename origin remote to template
+RUN git remote rename origin template
+
+WORKDIR /usr/src/sandy
 ENV FS_ROOT_PATH=/app
 
 CMD ["bun", "run", "src/server/server.ts"]
