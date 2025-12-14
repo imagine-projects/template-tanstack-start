@@ -12,7 +12,6 @@ module.exports = {
       env_file: '.env',
       env: {
         PORT: '3000',
-        ...process.env,        
         APPWRITE_ENDPOINT: process.env.APPWRITE_ENDPOINT,
         APPWRITE_PROJECT_ID: process.env.APPWRITE_PROJECT_ID,
         APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
@@ -32,7 +31,6 @@ module.exports = {
       env_file: '.env',
       env: {
         PORT: '3000',
-        ...process.env,        
         APPWRITE_ENDPOINT: process.env.APPWRITE_ENDPOINT,
         APPWRITE_PROJECT_ID: process.env.APPWRITE_PROJECT_ID,
         APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
