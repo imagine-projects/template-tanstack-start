@@ -60,6 +60,7 @@ function SignInPage() {
         navigate({ to: search.redirect })
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: async (error: any) => {
       // Check if it's a redirect error (TanStack Start throws redirects as errors)
       if (
