@@ -5,13 +5,13 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "start": "bun run server.ts",
-    "build": "tsc --noEmit && vite build --sourcemap",
-    "build:node": "FOR_SITES=true vite build",
+    "build": "tsr generate && tsc --noEmit && vite build --sourcemap",
+    "build:node": "tsr generate && FOR_SITES=true vite build",
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
+    "format:check": "prettier --check .",
     "format": "prettier --write .",
-    "check": "tsr generate && prettier --write . && tsc -b --noEmit",
     "generate:routes": "tsr generate",
     "clean": "rm -rf .ouptut dist node_modules/.vite .nitro .tanstack"
   },
