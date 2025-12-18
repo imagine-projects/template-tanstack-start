@@ -1,7 +1,11 @@
 import { createServerFn } from '@tanstack/react-start'
 import z from 'zod'
 import { redirect } from '@tanstack/react-router'
-import { createAdminClient, createSessionClient } from '../lib/appwrite'
+import {
+  createAdminClient,
+  createSessionClient,
+  getCookieName,
+} from '../lib/appwrite'
 import { AppwriteException, ID } from 'node-appwrite'
 import {
   deleteCookie,
@@ -12,7 +16,8 @@ import {
 
 export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const session = getCookie(`appwrite-session-secret`)
+    const name = getCookieName()
+    const session = getCookie(name)
 
     if (!session) {
       return null
@@ -23,19 +28,15 @@ export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.string(), secret: z.string() }))
+  .inputValidator(z.object({ secret: z.string() }))
   .handler(async ({ data }) => {
-    const { id, secret } = data
-    setCookie(`appwrite-session-secret`, secret, {
+    const { secret } = data
+    const isProduction = process.env.NODE_ENV === 'production'
+    const name = getCookieName()
+    setCookie(name, secret, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    })
-
-    setCookie(`appwrite-session-id`, id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
     })
   })
 
@@ -58,7 +59,7 @@ export const signUpFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: { secret: session.secret },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -88,7 +89,7 @@ export const signInFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: { secret: session.secret },
       })
     } catch (_error) {
       const error = _error as AppwriteException
