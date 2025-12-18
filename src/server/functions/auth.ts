@@ -109,8 +109,15 @@ export const signInFn = createServerFn({ method: 'POST' })
 
 export const signOutFn = createServerFn({ method: 'POST' }).handler(
   async () => {
-    deleteCookie(`appwrite-session-secret`)
-    deleteCookie(`appwrite-session-id`)
+    const session = await getAppwriteSessionFn()
+
+    if (session) {
+      const client = await createSessionClient(session)
+      client.account.deleteSession({ sessionId: 'current' })
+    }
+
+    const name = getCookieName()
+    deleteCookie(name)
   },
 )
 
