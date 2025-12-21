@@ -92,7 +92,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build sandbox templates
-        uses: imagine-projects/build-template-action@v1
+        uses: imagine-projects/build-template-action@5bd716a895e00089d5bbacc7c088cfaf86b0709e
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
           name: template-tanstack-start
