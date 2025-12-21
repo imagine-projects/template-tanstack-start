@@ -1,13 +1,10 @@
-FROM appwrite/imagine-sandy-server:latest AS base
+FROM node:22-slim AS base
 
-RUN mkdir -p /home/user/app
+RUN apt-get update && apt-get install -y git lsof tree curl
+RUN npm install -g bun pm2
 
-WORKDIR /home/user/template
+WORKDIR /home/user/app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
-
-WORKDIR /home/user/sandy
-
-CMD ["bun", "run", "src/server/server.ts"]
