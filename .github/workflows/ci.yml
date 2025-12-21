@@ -90,3 +90,10 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build sandbox templates
+        uses: imagine-projects/build-template-action@v1
+        with:
+          sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
+          name: template-tanstack-start
+          dockerTags: ${{ steps.meta.outputs.tags }}
