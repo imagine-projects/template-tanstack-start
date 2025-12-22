@@ -95,5 +95,4 @@ jobs:
         uses: imagine-projects/build-template-action@44707e043ae1e09c6d623d4a77633a4a7f0aa254
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
-          name: template-tanstack-start
-          dockerTags: ${{ steps.meta.outputs.tags }}
+          dockerTags: ghcr.io/imagine-projects/template-tanstack-start:test-pr
