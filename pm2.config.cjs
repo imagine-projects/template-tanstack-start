@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: 'dev',
-      cwd: '/app',
+      cwd: '/home/user/app',
       script: 'bun run dev',
       exec_mode: 'fork',
       instances: 1,
@@ -22,7 +22,7 @@ module.exports = {
     },
     {
       name: 'start',
-      cwd: '/app',
+      cwd: '/home/user/app',
       script: 'bun run start',
       exec_mode: 'fork',
       instances: 1,
