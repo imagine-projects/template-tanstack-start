@@ -62,37 +62,37 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GHCR
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/imagine-projects/template-tanstack-start
-          tags: |
-            type=ref,event=branch,prefix=branch-
-            type=ref,event=pr,prefix=pr-
-            type=sha,prefix=sha-,format=short
-            type=raw,value=gh-${{ github.run_id }}
-          flavor: |
-            latest=false
+      # - name: Docker meta
+      #   id: meta
+      #   uses: docker/metadata-action@v5
+      #   with:
+      #     images: ghcr.io/imagine-projects/template-tanstack-start
+      #     tags: |
+      #       type=ref,event=branch,prefix=branch-
+      #       type=ref,event=pr,prefix=pr-
+      #       type=sha,prefix=sha-,format=short
+      #       type=raw,value=gh-${{ github.run_id }}
+      #     flavor: |
+      #       latest=false
 
-      - name: Build and push
-        uses: useblacksmith/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      # - name: Build and push
+      #   uses: useblacksmith/build-push-action@v2
+      #   with:
+      #     context: .
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build sandbox templates
-        uses: imagine-projects/build-template-action@42f881d59e4c6cab06d626b2b4e489ac0e8d1587
+        uses: imagine-projects/build-template-action@44707e043ae1e09c6d623d4a77633a4a7f0aa254
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
           name: template-tanstack-start
