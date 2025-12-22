@@ -92,7 +92,7 @@ jobs:
       #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build sandbox templates
-        uses: imagine-projects/build-template-action@9ada86d62eadec93ee70464bd0d41f44e5cf0046
+        uses: imagine-projects/build-template-action@90e2ead38f68f62dec58eb26ae4390bbe0e37a67
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
           dockerTags: ${{ steps.meta.outputs.tags }}
