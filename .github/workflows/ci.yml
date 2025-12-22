@@ -54,7 +54,7 @@ jobs:
   dockerize:
     name: Dockerize
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    needs: ci
+    # needs: ci
     permissions:
       contents: read
       packages: write
@@ -92,8 +92,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build sandbox templates
-        uses: imagine-projects/build-template-action@42f881d59e4c6cab06d626b2b4e489ac0e8d1587
+        uses: imagine-projects/build-template-action@main
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
-          name: template-tanstack-start
           dockerTags: ${{ steps.meta.outputs.tags }}
