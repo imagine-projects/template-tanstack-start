@@ -69,18 +69,18 @@ jobs:
       #     username: ${{ github.actor }}
       #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Docker meta
-      #   id: meta
-      #   uses: docker/metadata-action@v5
-      #   with:
-      #     images: ghcr.io/imagine-projects/template-tanstack-start
-      #     tags: |
-      #       type=ref,event=branch,prefix=branch-
-      #       type=ref,event=pr,prefix=pr-
-      #       type=sha,prefix=sha-,format=short
-      #       type=raw,value=gh-${{ github.run_id }}
-      #     flavor: |
-      #       latest=false
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/imagine-projects/template-tanstack-start
+          tags: |
+            type=ref,event=branch,prefix=branch-
+            type=ref,event=pr,prefix=pr-
+            type=sha,prefix=sha-,format=short
+            type=raw,value=gh-${{ github.run_id }}
+          flavor: |
+            latest=false
 
       # - name: Build and push
       #   uses: useblacksmith/build-push-action@v2
@@ -92,7 +92,7 @@ jobs:
       #     labels: ${{ steps.meta.outputs.labels }}
 
       - name: Build sandbox templates
-        uses: imagine-projects/build-template-action@44707e043ae1e09c6d623d4a77633a4a7f0aa254
+        uses: imagine-projects/build-template-action@d190cfa547620cdd249dfd84fe73df087d61e599
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
-          dockerTags: ghcr.io/imagine-projects/template-tanstack-start:test-pr
+          dockerTags: ${{ steps.meta.outputs.tags }}
