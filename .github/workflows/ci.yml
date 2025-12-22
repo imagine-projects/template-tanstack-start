@@ -54,7 +54,7 @@ jobs:
   dockerize:
     name: Dockerize
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    # needs: ci
+    needs: ci
     permissions:
       contents: read
       packages: write
