@@ -28,7 +28,9 @@ export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ secret: z.string() }))
+  .inputValidator(
+    z.object({ secret: z.string(), expire: z.iso.datetime({ offset: true }) }),
+  )
   .handler(async ({ data }) => {
     const { secret } = data
     const isProduction = process.env.NODE_ENV === 'production'
@@ -37,6 +39,7 @@ export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? 'none' : 'lax',
+      expires: new Date(data.expire),
     })
   })
 
@@ -59,7 +62,7 @@ export const signUpFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { secret: session.secret },
+        data: { secret: session.secret, expire: session.expire },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -89,7 +92,7 @@ export const signInFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { secret: session.secret },
+        data: { secret: session.secret, expire: session.expire },
       })
     } catch (_error) {
       const error = _error as AppwriteException
