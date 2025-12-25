@@ -60,11 +60,11 @@ function SignInPage() {
         await navigate({ to: search.redirect })
       }
     },
-     
+
     onError: async (error: {
-      status: number,
-      redirect: boolean,
-      message: string,
+      status: number
+      redirect: boolean
+      message: string
     }) => {
       // Check if it's a redirect error (TanStack Start throws redirects as errors)
       if (
