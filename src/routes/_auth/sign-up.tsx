@@ -34,7 +34,7 @@ const signUpSchema = z.object({
 })
 
 function SignUpPage() {
-  const search = useSearch({ from: '/_auth/sign-up' })
+  const search = useSearch({ from: Route.id })
   const navigate = useNavigate()
   const router = useRouter()
   const signUp = useServerFn(signUpFn)
@@ -57,11 +57,15 @@ function SignUpPage() {
       await router.invalidate()
       // Navigate to the redirect destination if provided
       if (search.redirect) {
-        navigate({ to: search.redirect })
+        await navigate({ to: search.redirect })
       }
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: async (error: any) => {
+     
+    onError: async (error: {
+      status: number,
+      redirect: boolean,
+      message: string,
+    }) => {
       // Check if it's a redirect error (TanStack Start throws redirects as errors)
       if (
         error?.status === 302 ||
@@ -72,7 +76,7 @@ function SignUpPage() {
         await router.invalidate()
         // Navigate to the redirect destination if provided
         if (search.redirect) {
-          navigate({ to: search.redirect })
+          await navigate({ to: search.redirect })
         }
         return
       }
