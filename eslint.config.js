@@ -18,7 +18,7 @@ export default tseslint.config(
       'eslint.config.js',
     ],
   },
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommended,
   {
     languageOptions: {
       parserOptions: {
