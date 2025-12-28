@@ -1,4 +1,4 @@
-FROM appwrite/sandbox-template-utils:latest AS base
+FROM ghcr.io/appwrite-labs/imagine-sandbox-utils:branch-main AS base
 
 WORKDIR /home/user/app
 COPY package.json bun.lock ./
