@@ -16,6 +16,7 @@ export default tseslint.config(
       '.nitro',
       'prettier.config.js',
       'eslint.config.js',
+      'src/routeTree.gen.ts',
     ],
   },
   ...tseslint.configs.recommended,
