@@ -116,7 +116,7 @@ export const signOutFn = createServerFn({ method: 'POST' }).handler(
 
     if (session) {
       const client = await createSessionClient(session)
-      client.account.deleteSession({ sessionId: 'current' })
+      await client.account.deleteSession({ sessionId: 'current' })
     }
 
     const name = getCookieName()

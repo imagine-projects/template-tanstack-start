@@ -29,7 +29,7 @@ export function ImaginePlaceholder() {
       // Invalidate router to refresh auth state
       await router.invalidate()
       // Navigate to the redirect destination if provided
-      navigate({ to: '/sign-in' })
+      await navigate({ to: '/sign-in' })
     },
   })
 
