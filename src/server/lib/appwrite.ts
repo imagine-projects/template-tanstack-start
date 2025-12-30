@@ -5,16 +5,25 @@
 
 import { Client, Account, Storage, Users } from 'node-appwrite'
 
-const getAppwriteClientCredentials = () => {
-  const endpoint = process.env.APPWRITE_ENDPOINT
+export function getAppwriteConfig() {
+  const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT
   if (!endpoint) {
-    throw new Error('APPWRITE_ENDPOINT is not set')
+    throw new Error('VITE_APPWRITE_ENDPOINT is not set')
   }
 
-  const projectId = process.env.APPWRITE_PROJECT_ID
+  const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID
   if (!projectId) {
-    throw new Error('APPWRITE_PROJECT_ID is not set')
+    throw new Error('VITE_APPWRITE_PROJECT_ID is not set')
   }
+
+  return {
+    endpoint,
+    projectId,
+  }
+}
+
+const getAppwriteClientCredentials = () => {
+  const { endpoint, projectId } = getAppwriteConfig()
 
   const apiKey = process.env.APPWRITE_API_KEY
   if (!apiKey) {
@@ -28,10 +37,18 @@ const getAppwriteClientCredentials = () => {
   }
 }
 
-export async function createSessionClient(session: string) {
-  const { endpoint, projectId } = getAppwriteClientCredentials()
+export function getCookieName() {
+  const { projectId } = getAppwriteConfig()
+  return `a_session_${projectId}`
+}
+
+export function createSessionClient(session: string = '') {
+  const { endpoint, projectId } = getAppwriteConfig()
   const client = new Client().setEndpoint(endpoint).setProject(projectId)
-  client.setSession(session)
+
+  if (session) {
+    client.setSession(session)
+  }
 
   return {
     client: client,
