@@ -1,6 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
 import z from 'zod'
-import { redirect } from '@tanstack/react-router'
 import {
   createAdminClient,
   createSessionClient,
@@ -46,13 +45,12 @@ export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
 const signUpInSchema = z.object({
   email: z.email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  redirect: z.string().optional(),
 })
 
 export const signUpFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
-    const { email, password, redirect: redirectUrl } = data
+    const { email, password } = data
     const { account } = createAdminClient()
 
     try {
@@ -72,18 +70,12 @@ export const signUpFn = createServerFn({ method: 'POST' })
         status: error.code,
       }
     }
-
-    if (redirectUrl) {
-      throw redirect({ to: redirectUrl })
-    } else {
-      throw redirect({ to: '/' })
-    }
   })
 
 export const signInFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
-    const { email, password, redirect: redirectUrl } = data
+    const { email, password } = data
 
     try {
       const { account } = createAdminClient()
@@ -101,12 +93,6 @@ export const signInFn = createServerFn({ method: 'POST' })
         message: error.message,
         status: error.code,
       }
-    }
-
-    if (redirectUrl) {
-      throw redirect({ to: redirectUrl })
-    } else {
-      throw redirect({ to: '/' })
     }
   })
 

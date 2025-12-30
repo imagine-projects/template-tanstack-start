@@ -47,11 +47,8 @@ function SignInPage() {
   })
 
   const signInMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof signInSchema>) => {
-      await signIn({
-        data: { ...data, redirect: search.redirect },
-      })
-    },
+    mutationFn: (data: z.infer<typeof signInSchema>) =>
+      signIn({ data: { ...data } }),
     onSuccess: async () => {
       // Invalidate router to refresh auth state
       await router.invalidate()

@@ -49,7 +49,7 @@ function SignUpPage() {
   const signUpMutation = useMutation({
     mutationFn: async (data: z.infer<typeof signUpSchema>) => {
       await signUp({
-        data: { ...data, redirect: search.redirect },
+        data: { ...data },
       })
     },
     onSuccess: async () => {
