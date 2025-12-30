@@ -141,7 +141,7 @@ export const getCurrentUser = createServerFn({ method: 'GET' }).handler(
     if (!session) {
       return null
     } else {
-      const client = await createSessionClient(session!)
+      const client = await createSessionClient(session)
       const currentUser = await client.account.get()
       return currentUser
     }

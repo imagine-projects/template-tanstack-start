@@ -1,14 +1,11 @@
-FROM appwrite/imagine-sandy-server:latest AS base
+FROM ghcr.io/appwrite-labs/imagine-sandbox-utils:branch-main AS base
 
-RUN mkdir -p /app
-
-WORKDIR /tmp/template
+WORKDIR /home/user/app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
 COPY . .
 
-WORKDIR /usr/src/sandy
-ENV FS_ROOT_PATH=/app
+WORKDIR /home/user/utils
 
-CMD ["bun", "run", "src/server/server.ts"]
+CMD ["bun", "run", "start:pm2"]

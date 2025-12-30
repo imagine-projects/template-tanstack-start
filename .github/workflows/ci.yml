@@ -90,3 +90,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build sandbox templates
+        uses: imagine-projects/build-template-action@main
+        with:
+          sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
+          dockerTags: ${{ steps.meta.outputs.tags }}
+          cpuCount: 4
+          memoryMB: 3072
