@@ -2,12 +2,11 @@
  * @imagine-readonly
  */
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createFileRoute,
   Link,
   useNavigate,
-  useRouter,
   useSearch,
 } from '@tanstack/react-router'
 import { z } from 'zod'
@@ -18,6 +17,7 @@ import { signInFn } from '@/server/functions/auth'
 import { useServerFn } from '@tanstack/react-start'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { authQueryKey } from '@/lib/react-query/query-keys'
 
 const searchSchema = z.object({
   redirect: z.string().optional(),
@@ -36,7 +36,7 @@ const signInSchema = z.object({
 function SignInPage() {
   const search = useSearch({ from: '/_auth/sign-in' })
   const navigate = useNavigate()
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const signIn = useServerFn(signInFn)
   const form = useForm({
     resolver: zodResolver(signInSchema),
@@ -47,14 +47,11 @@ function SignInPage() {
   })
 
   const signInMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof signInSchema>) => {
-      await signIn({
-        data: { ...data, redirect: search.redirect },
-      })
-    },
+    mutationFn: (data: z.infer<typeof signInSchema>) =>
+      signIn({ data: { ...data } }),
     onSuccess: async () => {
-      // Invalidate router to refresh auth state
-      await router.invalidate()
+      // Invalidate auth state so it will be refetched
+      await queryClient.invalidateQueries({ queryKey: authQueryKey() })
       // Navigate to the redirect destination if provided
       if (search.redirect) {
         await navigate({ to: search.redirect })
@@ -66,20 +63,6 @@ function SignInPage() {
       redirect: boolean
       message: string
     }) => {
-      // Check if it's a redirect error (TanStack Start throws redirects as errors)
-      if (
-        error?.status === 302 ||
-        error?.redirect ||
-        error?.message?.includes('redirect')
-      ) {
-        // Invalidate router to refresh auth state
-        await router.invalidate()
-        // Navigate to the redirect destination if provided
-        if (search.redirect) {
-          await navigate({ to: search.redirect })
-        }
-        return
-      }
       console.error('Sign in error:', error)
       form.setError('root', { message: error.message || 'Failed to sign in' })
     },
