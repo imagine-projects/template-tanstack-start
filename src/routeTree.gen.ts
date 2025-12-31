@@ -15,7 +15,6 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as PublicIndexRouteImport } from './routes/_public/index'
 import { Route as ProtectedExampleProtectedRouteRouteImport } from './routes/_protected/example-protected-route'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
-import { Route as AuthSignOutRouteImport } from './routes/_auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as ApiHelloRouteImport } from './routes/_api/hello'
 
@@ -47,11 +46,6 @@ const AuthSignUpRoute = AuthSignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthSignOutRoute = AuthSignOutRouteImport.update({
-  id: '/sign-out',
-  path: '/sign-out',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthSignInRoute = AuthSignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
@@ -66,7 +60,6 @@ const ApiHelloRoute = ApiHelloRouteImport.update({
 export interface FileRoutesByFullPath {
   '/hello': typeof ApiHelloRoute
   '/sign-in': typeof AuthSignInRoute
-  '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
   '/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/': typeof PublicIndexRoute
@@ -74,7 +67,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/hello': typeof ApiHelloRoute
   '/sign-in': typeof AuthSignInRoute
-  '/sign-out': typeof AuthSignOutRoute
   '/sign-up': typeof AuthSignUpRoute
   '/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/': typeof PublicIndexRoute
@@ -86,7 +78,6 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/_api/hello': typeof ApiHelloRoute
   '/_auth/sign-in': typeof AuthSignInRoute
-  '/_auth/sign-out': typeof AuthSignOutRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/_protected/example-protected-route': typeof ProtectedExampleProtectedRouteRoute
   '/_public/': typeof PublicIndexRoute
@@ -96,18 +87,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/hello'
     | '/sign-in'
-    | '/sign-out'
     | '/sign-up'
     | '/example-protected-route'
     | '/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/hello'
-    | '/sign-in'
-    | '/sign-out'
-    | '/sign-up'
-    | '/example-protected-route'
-    | '/'
+  to: '/hello' | '/sign-in' | '/sign-up' | '/example-protected-route' | '/'
   id:
     | '__root__'
     | '/_auth'
@@ -115,7 +99,6 @@ export interface FileRouteTypes {
     | '/_public'
     | '/_api/hello'
     | '/_auth/sign-in'
-    | '/_auth/sign-out'
     | '/_auth/sign-up'
     | '/_protected/example-protected-route'
     | '/_public/'
@@ -172,13 +155,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignUpRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/sign-out': {
-      id: '/_auth/sign-out'
-      path: '/sign-out'
-      fullPath: '/sign-out'
-      preLoaderRoute: typeof AuthSignOutRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/sign-in': {
       id: '/_auth/sign-in'
       path: '/sign-in'
@@ -198,13 +174,11 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthSignInRoute: typeof AuthSignInRoute
-  AuthSignOutRoute: typeof AuthSignOutRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthSignInRoute: AuthSignInRoute,
-  AuthSignOutRoute: AuthSignOutRoute,
   AuthSignUpRoute: AuthSignUpRoute,
 }
 

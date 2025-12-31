@@ -1,15 +1,28 @@
-import { Link, useLocation } from '@tanstack/react-router'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
-import { useServerFn } from '@tanstack/react-start'
-import { signOutFn } from '@/server/functions/auth'
 import { useAuth } from '@/hooks/use-auth'
+import { Loader2 } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { authQueryKey } from '@/lib/react-query/query-keys'
 
 export function ImaginePlaceholder() {
-  const { currentUser } = useAuth()
-  const signOut = useServerFn(signOutFn)
+  const { currentUser, signOut } = useAuth()
+  const queryClient = useQueryClient()
   const location = useLocation()
+  const navigate = useNavigate()
+
   const { theme } = useTheme()
+
+  const signOutMutation = useMutation({
+    mutationFn: () => signOut(),
+    onSuccess: async () => {
+      // Invalidate auth state so it will be refetched
+      await queryClient.invalidateQueries({ queryKey: authQueryKey() })
+      // Navigate to the sign-in page
+      await navigate({ to: '/sign-in' })
+    },
+  })
 
   return (
     <div className="flex-grow flex flex-col justify-center items-center gap-6 text-center">
@@ -29,8 +42,19 @@ export function ImaginePlaceholder() {
             You are signed in as{' '}
             <span className="font-medium">{currentUser.email}</span>
           </p>
-          <Button size="sm" onClick={() => signOut()}>
-            Sign out
+          <Button
+            size="sm"
+            onClick={() => signOutMutation.mutate()}
+            disabled={signOutMutation.isPending}
+          >
+            {signOutMutation.isPending ? (
+              <div className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Signing out...
+              </div>
+            ) : (
+              'Sign out'
+            )}
           </Button>
         </>
       ) : (

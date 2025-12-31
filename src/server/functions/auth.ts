@@ -1,7 +1,10 @@
 import { createServerFn } from '@tanstack/react-start'
 import z from 'zod'
-import { redirect } from '@tanstack/react-router'
-import { createAdminClient, createSessionClient } from '../lib/appwrite'
+import {
+  createAdminClient,
+  createSessionClient,
+  getCookieName,
+} from '../lib/appwrite'
 import { AppwriteException, ID } from 'node-appwrite'
 import {
   deleteCookie,
@@ -12,7 +15,8 @@ import {
 
 export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const session = getCookie(`appwrite-session-secret`)
+    const name = getCookieName()
+    const session = getCookie(name)
 
     if (!session) {
       return null
@@ -23,32 +27,30 @@ export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
 )
 
 export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.string(), secret: z.string() }))
+  .inputValidator(
+    z.object({ secret: z.string(), expire: z.iso.datetime({ offset: true }) }),
+  )
   .handler(async ({ data }) => {
-    const { id, secret } = data
-    setCookie(`appwrite-session-secret`, secret, {
+    const { secret } = data
+    const isProduction = process.env.NODE_ENV === 'production'
+    const name = getCookieName()
+    setCookie(name, secret, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    })
-
-    setCookie(`appwrite-session-id`, id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      expires: new Date(data.expire),
     })
   })
 
 const signUpInSchema = z.object({
   email: z.email('Please enter a valid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  redirect: z.string().optional(),
 })
 
 export const signUpFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
-    const { email, password, redirect: redirectUrl } = data
+    const { email, password } = data
     const { account } = createAdminClient()
 
     try {
@@ -58,7 +60,7 @@ export const signUpFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: { secret: session.secret, expire: session.expire },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -68,18 +70,12 @@ export const signUpFn = createServerFn({ method: 'POST' })
         status: error.code,
       }
     }
-
-    if (redirectUrl) {
-      throw redirect({ to: redirectUrl })
-    } else {
-      throw redirect({ to: '/' })
-    }
   })
 
 export const signInFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
-    const { email, password, redirect: redirectUrl } = data
+    const { email, password } = data
 
     try {
       const { account } = createAdminClient()
@@ -88,7 +84,7 @@ export const signInFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: { secret: session.secret, expire: session.expire },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -98,18 +94,19 @@ export const signInFn = createServerFn({ method: 'POST' })
         status: error.code,
       }
     }
-
-    if (redirectUrl) {
-      throw redirect({ to: redirectUrl })
-    } else {
-      throw redirect({ to: '/' })
-    }
   })
 
 export const signOutFn = createServerFn({ method: 'POST' }).handler(
   async () => {
-    deleteCookie(`appwrite-session-secret`)
-    deleteCookie(`appwrite-session-id`)
+    const session = await getAppwriteSessionFn()
+
+    if (session) {
+      const client = await createSessionClient(session)
+      await client.account.deleteSession({ sessionId: 'current' })
+    }
+
+    const name = getCookieName()
+    deleteCookie(name)
   },
 )
 
@@ -129,10 +126,13 @@ export const getCurrentUser = createServerFn({ method: 'GET' }).handler(
 
     if (!session) {
       return null
-    } else {
-      const client = await createSessionClient(session)
-      const currentUser = await client.account.get()
-      return currentUser
+    }
+
+    const client = createSessionClient(session)
+    try {
+      return await client.account.get()
+    } catch {
+      return null
     }
   },
 )
