@@ -23,20 +23,41 @@ export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+const setAppwriteSessionCookiesSchema = z.object({
+  id: z.string(),
+  secret: z.string(),
+  expires: z.string().optional(), // ISO 8601 format string from Appwrite session.expire
+})
+
 export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.string(), secret: z.string() }))
-  .handler(async ({ data }) => {
-    const { id, secret } = data
+  .inputValidator(setAppwriteSessionCookiesSchema)
+  .handler(async ({ data }: { data: z.infer<typeof setAppwriteSessionCookiesSchema> }) => {
+    const { id, secret, expires } = data
+
+    // Calculate maxAge in seconds (default to 30 days if no expiration provided)
+    // Appwrite expire is always an ISO 8601 format string (e.g., "2020-10-15T06:38:00.000+00:00")
+    let maxAge = 30 * 24 * 60 * 60 // Default: 30 days in seconds
+    if (expires) {
+      const expireTime = Math.floor(new Date(expires).getTime() / 1000)
+      const now = Math.floor(Date.now() / 1000)
+      maxAge = Math.max(0, expireTime - now)
+    }
+
+    // Set cookies with explicit expiration
     setCookie(`appwrite-session-secret`, secret, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      maxAge,
+      path: '/',
     })
 
     setCookie(`appwrite-session-id`, id, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      maxAge,
+      path: '/',
     })
   })
 
@@ -59,7 +80,11 @@ export const signUpFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: {
+          id: session.$id,
+          secret: session.secret,
+          expires: session.expire || undefined, // ISO 8601 format string
+        },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -89,7 +114,11 @@ export const signInFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: {
+          id: session.$id,
+          secret: session.secret,
+          expires: session.expire || undefined, // ISO 8601 format string
+        },
       })
     } catch (_error) {
       const error = _error as AppwriteException
