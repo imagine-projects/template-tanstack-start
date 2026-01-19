@@ -31,35 +31,41 @@ const setAppwriteSessionCookiesSchema = z.object({
 
 export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
   .inputValidator(setAppwriteSessionCookiesSchema)
-  .handler(async ({ data }: { data: z.infer<typeof setAppwriteSessionCookiesSchema> }) => {
-    const { id, secret, expires } = data
+  .handler(
+    async ({
+      data,
+    }: {
+      data: z.infer<typeof setAppwriteSessionCookiesSchema>
+    }) => {
+      const { id, secret, expires } = data
 
-    // Calculate maxAge in seconds (default to 30 days if no expiration provided)
-    // Appwrite expire is always an ISO 8601 format string (e.g., "2020-10-15T06:38:00.000+00:00")
-    let maxAge = 30 * 24 * 60 * 60 // Default: 30 days in seconds
-    if (expires) {
-      const expireTime = Math.floor(new Date(expires).getTime() / 1000)
-      const now = Math.floor(Date.now() / 1000)
-      maxAge = Math.max(0, expireTime - now)
-    }
+      // Calculate maxAge in seconds (default to 30 days if no expiration provided)
+      // Appwrite expire is always an ISO 8601 format string (e.g., "2020-10-15T06:38:00.000+00:00")
+      let maxAge = 30 * 24 * 60 * 60 // Default: 30 days in seconds
+      if (expires) {
+        const expireTime = Math.floor(new Date(expires).getTime() / 1000)
+        const now = Math.floor(Date.now() / 1000)
+        maxAge = Math.max(0, expireTime - now)
+      }
 
-    // Set cookies with explicit expiration
-    setCookie(`appwrite-session-secret`, secret, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge,
-      path: '/',
-    })
+      // Set cookies with explicit expiration
+      setCookie(`appwrite-session-secret`, secret, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge,
+        path: '/',
+      })
 
-    setCookie(`appwrite-session-id`, id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      maxAge,
-      path: '/',
-    })
-  })
+      setCookie(`appwrite-session-id`, id, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge,
+        path: '/',
+      })
+    },
+  )
 
 const signUpInSchema = z.object({
   email: z.email('Please enter a valid email address'),
