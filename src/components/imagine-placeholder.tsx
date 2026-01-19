@@ -1,10 +1,13 @@
 import { Link, useLocation } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
+import { useServerFn } from '@tanstack/react-start'
+import { signOutFn } from '@/server/functions/auth'
 import { useAuth } from '@/hooks/use-auth'
 
 export function ImaginePlaceholder() {
-  const { currentUser, signOut } = useAuth()
+  const { currentUser } = useAuth()
+  const signOut = useServerFn(signOutFn)
   const location = useLocation()
   const { theme } = useTheme()
 
@@ -26,7 +29,7 @@ export function ImaginePlaceholder() {
             You are signed in as{' '}
             <span className="font-medium">{currentUser.email}</span>
           </p>
-          <Button size="sm" onClick={signOut}>
+          <Button size="sm" onClick={() => signOut()}>
             Sign out
           </Button>
         </>

@@ -2,14 +2,12 @@ Welcome to your new TanStack app!
 
 # Getting Started
 
-To run this application in development mode:
+To run this application:
 
 ```bash
 bun install
-bun run dev
+bunx --bun run start
 ```
-
-The development server will start on `http://localhost:3000`.
 
 ## Environment Variables
 
@@ -23,48 +21,20 @@ Copy `.env.example` to `.env` before running the app and provide values for the 
 
 The app will fail to authenticate or access storage until these values are set.
 
-**Note:** The password recovery feature automatically detects the application's URL from the incoming request headers, so no additional configuration is needed for it to work across different environments.
-
-## Authentication Features
-
-This template includes a complete authentication system with the following features:
-
-- **Sign Up** (`/sign-up`) – Create a new user account
-- **Sign In** (`/sign-in`) – Authenticate existing users
-- **Sign Out** (`/sign-out`) – Log out and clear session
-- **Password Recovery** (`/forgot-password`) – Request a password reset email
-- **Reset Password** (`/reset-password`) – Set a new password using the recovery link
-
-The password recovery flow works as follows:
-
-1. User visits `/forgot-password` and enters their email
-2. User receives an email with a recovery link
-3. User clicks the link, which redirects to `/reset-password?userId=...&secret=...`
-4. User enters and confirms their new password
-5. User is redirected to sign in with their new credentials
-
 # Building For Production
 
 To build this application for production:
 
 ```bash
-bun run build
+bunx --bun run build
 ```
-
-After building, you can run the production server:
-
-```bash
-bun run start
-```
-
-The production server will start on `http://localhost:3000` (or the port specified in the `PORT` environment variable).
 
 ## Testing
 
 This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
 
 ```bash
-bun run test
+bunx --bun run test
 ```
 
 ## Styling
@@ -76,9 +46,9 @@ This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
 This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
 
 ```bash
-bun run lint
-bun run format
-bun run format:check
+bunx --bun run lint
+bunx --bun run format
+bunx --bun run check
 ```
 
 ## Shadcn
