@@ -112,13 +112,23 @@ function SignInPage() {
               type="email"
             />
 
-            <AuthField
-              control={form.control}
-              name="password"
-              label="Password"
-              placeholder="Enter your password"
-              type="password"
-            />
+            <div className="space-y-2">
+              <AuthField
+                control={form.control}
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+                type="password"
+              />
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs md:text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
           </>
         )}
       </AuthForm>
