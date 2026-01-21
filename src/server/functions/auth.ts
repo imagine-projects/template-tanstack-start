@@ -223,10 +223,9 @@ export const forgotPasswordFn = createServerFn({ method: 'POST' })
         ),
       ),
     )
-    
+
     const { email } = data
     const { account } = createAdminClient()
-
 
     try {
       // Get the base URL from the request headers
