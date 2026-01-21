@@ -205,25 +205,6 @@ const forgotPasswordSchema = z.object({
 export const forgotPasswordFn = createServerFn({ method: 'POST' })
   .inputValidator(forgotPasswordSchema)
   .handler(async ({ data }) => {
-    // At the top of the handler, before anything else:
-    console.log(
-      'ALL REQUEST HEADERS:',
-      JSON.stringify(
-        Object.fromEntries(
-          [
-            'host',
-            'x-forwarded-host',
-            'x-forwarded-proto',
-            'x-forwarded-for',
-            'x-real-ip',
-            'x-original-host',
-            'origin',
-            'referer',
-          ].map((h) => [h, getRequestHeader(h)]),
-        ),
-      ),
-    )
-
     const { email } = data
     const { account } = createAdminClient()
 
