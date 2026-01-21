@@ -8,6 +8,7 @@ import {
   getCookie,
   setCookie,
   setResponseStatus,
+  getRequestHeader,
 } from '@tanstack/react-start/server'
 
 export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
@@ -22,22 +23,49 @@ export const getAppwriteSessionFn = createServerFn({ method: 'GET' }).handler(
   },
 )
 
-export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ id: z.string(), secret: z.string() }))
-  .handler(async ({ data }) => {
-    const { id, secret } = data
-    setCookie(`appwrite-session-secret`, secret, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    })
+const setAppwriteSessionCookiesSchema = z.object({
+  id: z.string(),
+  secret: z.string(),
+  expires: z.string().optional(), // ISO 8601 format string from Appwrite session.expire
+})
 
-    setCookie(`appwrite-session-id`, id, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    })
-  })
+export const setAppwriteSessionCookiesFn = createServerFn({ method: 'POST' })
+  .inputValidator(setAppwriteSessionCookiesSchema)
+  .handler(
+    async ({
+      data,
+    }: {
+      data: z.infer<typeof setAppwriteSessionCookiesSchema>
+    }) => {
+      const { id, secret, expires } = data
+
+      // Calculate maxAge in seconds (default to 30 days if no expiration provided)
+      // Appwrite expire is always an ISO 8601 format string (e.g., "2020-10-15T06:38:00.000+00:00")
+      let maxAge = 30 * 24 * 60 * 60 // Default: 30 days in seconds
+      if (expires) {
+        const expireTime = Math.floor(new Date(expires).getTime() / 1000)
+        const now = Math.floor(Date.now() / 1000)
+        maxAge = Math.max(0, expireTime - now)
+      }
+
+      // Set cookies with explicit expiration
+      setCookie(`appwrite-session-secret`, secret, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge,
+        path: '/',
+      })
+
+      setCookie(`appwrite-session-id`, id, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge,
+        path: '/',
+      })
+    },
+  )
 
 const signUpInSchema = z.object({
   email: z.email('Please enter a valid email address'),
@@ -58,7 +86,11 @@ export const signUpFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: {
+          id: session.$id,
+          secret: session.secret,
+          expires: session.expire || undefined, // ISO 8601 format string
+        },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -88,7 +120,11 @@ export const signInFn = createServerFn({ method: 'POST' })
         password,
       })
       await setAppwriteSessionCookiesFn({
-        data: { id: session.$id, secret: session.secret },
+        data: {
+          id: session.$id,
+          secret: session.secret,
+          expires: session.expire || undefined, // ISO 8601 format string
+        },
       })
     } catch (_error) {
       const error = _error as AppwriteException
@@ -106,12 +142,23 @@ export const signInFn = createServerFn({ method: 'POST' })
     }
   })
 
-export const signOutFn = createServerFn({ method: 'POST' }).handler(
-  async () => {
-    deleteCookie(`appwrite-session-secret`)
-    deleteCookie(`appwrite-session-id`)
-  },
-)
+export const signOutFn = createServerFn({ method: 'GET' }).handler(async () => {
+  try {
+    const session = await getAppwriteSessionFn()
+
+    if (session) {
+      const client = await createSessionClient(session)
+      // Delete the session on Appwrite server
+      await client.account.deleteSession({ sessionId: 'current' })
+    }
+  } catch (error) {
+    // Even if session deletion fails, we still want to clear local cookies
+    console.error('Error deleting session:', error)
+  } finally {
+    // Always delete the cookies
+    clearAuthCookies()
+  }
+})
 
 export const authMiddleware = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -123,16 +170,109 @@ export const authMiddleware = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+const clearAuthCookies = () => {
+  deleteCookie(`appwrite-session-secret`)
+  deleteCookie(`appwrite-session-id`)
+  deleteCookie(`a_session_${process.env.APPWRITE_PROJECT_ID}`)
+}
+
 export const getCurrentUser = createServerFn({ method: 'GET' }).handler(
   async () => {
     const session = await getAppwriteSessionFn()
 
     if (!session) {
       return null
-    } else {
+    }
+
+    try {
       const client = await createSessionClient(session)
       const currentUser = await client.account.get()
       return currentUser
+    } catch (_error) {
+      const error = _error as AppwriteException
+      if (error.code === 401) {
+        clearAuthCookies()
+      }
+      return null
     }
   },
 )
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+})
+
+export const forgotPasswordFn = createServerFn({ method: 'POST' })
+  .inputValidator(forgotPasswordSchema)
+  .handler(async ({ data }) => {
+    const { email } = data
+    const { account } = createAdminClient()
+
+    try {
+      // Get the base URL from the request headers
+      const host =
+        getRequestHeader('x-forwarded-host') ||
+        getRequestHeader('host') ||
+        'localhost:3000'
+      const proto = getRequestHeader('x-forwarded-proto') || 'http'
+      // If the host already includes protocol (shouldn't happen but just in case), use as is
+      const baseUrl = host.startsWith('http') ? host : `${proto}://${host}`
+      const resetUrl = `${baseUrl}/reset-password`
+
+      await account.createRecovery({ email, url: resetUrl })
+
+      return {
+        success: true,
+        message: 'Password recovery email sent successfully',
+      }
+    } catch (_error) {
+      const error = _error as AppwriteException
+      setResponseStatus(error.code)
+      throw {
+        message: error.message,
+        status: error.code,
+      }
+    }
+  })
+
+const resetPasswordSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  secret: z.string().min(1, 'Secret is required'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+  confirmPassword: z.string().min(8, 'Password must be at least 8 characters'),
+})
+
+export const resetPasswordFn = createServerFn({ method: 'POST' })
+  .inputValidator(resetPasswordSchema)
+  .handler(async ({ data }) => {
+    const { userId, secret, password, confirmPassword } = data
+
+    if (password !== confirmPassword) {
+      setResponseStatus(400)
+      throw {
+        message: 'Passwords do not match',
+        status: 400,
+      }
+    }
+
+    try {
+      const { account } = createAdminClient()
+      await account.updateRecovery({
+        userId,
+        secret,
+        password,
+      })
+
+      return {
+        success: true,
+        message: 'Password reset successfully',
+      }
+    } catch (_error) {
+      const error = _error as AppwriteException
+      setResponseStatus(error.code)
+      throw {
+        message: error.message,
+        status: error.code,
+      }
+    }
+  })
