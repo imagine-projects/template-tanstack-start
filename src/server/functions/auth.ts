@@ -228,15 +228,12 @@ export const forgotPasswordFn = createServerFn({ method: 'POST' })
     const { account } = createAdminClient()
 
     try {
-      // Get the base URL from the request headers
-      const host =
-        getRequestHeader('x-forwarded-host') ||
-        getRequestHeader('host') ||
-        'localhost:3000'
-      const proto = getRequestHeader('x-forwarded-proto') || 'http'
-      // If the host already includes protocol (shouldn't happen but just in case), use as is
-      const baseUrl = host.startsWith('http') ? host : `${proto}://${host}`
-      const resetUrl = `${baseUrl}/reset-password`
+      // Get the base URL from the origin header (includes protocol)
+      const origin = getRequestHeader('origin')
+      if (!origin) {
+        throw new Error('Missing origin header')
+      }
+      const resetUrl = `${origin}/reset-password`
 
       await account.createRecovery({ email, url: resetUrl })
 
