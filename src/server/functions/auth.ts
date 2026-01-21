@@ -156,8 +156,7 @@ export const signOutFn = createServerFn({ method: 'GET' }).handler(async () => {
     console.error('Error deleting session:', error)
   } finally {
     // Always delete the cookies
-    deleteCookie(`appwrite-session-secret`)
-    deleteCookie(`appwrite-session-id`)
+    clearAuthCookies()
   }
 })
 
@@ -171,16 +170,30 @@ export const authMiddleware = createServerFn({ method: 'GET' }).handler(
   },
 )
 
+const clearAuthCookies = () => {
+  deleteCookie(`appwrite-session-secret`)
+  deleteCookie(`appwrite-session-id`)
+  deleteCookie(`a_session_${process.env.APPWRITE_PROJECT_ID}`)
+}
+
 export const getCurrentUser = createServerFn({ method: 'GET' }).handler(
   async () => {
     const session = await getAppwriteSessionFn()
 
     if (!session) {
       return null
-    } else {
+    }
+
+    try {
       const client = await createSessionClient(session)
       const currentUser = await client.account.get()
       return currentUser
+    } catch (_error) {
+      const error = _error as AppwriteException
+      if (error.code === 401) {
+        clearAuthCookies()
+      }
+      return null
     }
   },
 )
