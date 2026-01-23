@@ -11,7 +11,8 @@ export const Route = createFileRoute('/_api/og')({
         const title = searchParams.get('title') || defaultOGConfig.title
         const description =
           searchParams.get('description') || defaultOGConfig.description
-        const bgColor = searchParams.get('bgColor') || defaultOGConfig.backgroundColor
+        const bgColor =
+          searchParams.get('bgColor') || defaultOGConfig.backgroundColor
         const titleColor =
           searchParams.get('titleColor') || defaultOGConfig.titleColor
         const descriptionColor =
@@ -20,12 +21,12 @@ export const Route = createFileRoute('/_api/og')({
         const titleSize = parseInt(
           searchParams.get('titleSize') ||
             defaultOGConfig.fontSize?.title.toString() ||
-            '60'
+            '60',
         )
         const descSize = parseInt(
           searchParams.get('descSize') ||
             defaultOGConfig.fontSize?.description.toString() ||
-            '30'
+            '30',
         )
         const width = defaultOGConfig.width || 1200
         const height = defaultOGConfig.height || 630
@@ -116,7 +117,7 @@ export const Route = createFileRoute('/_api/og')({
           {
             width,
             height,
-          }
+          },
         ) as unknown as Response
       },
     },

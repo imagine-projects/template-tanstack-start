@@ -43,7 +43,7 @@ export const defaultOGConfig: OGImageConfig = {
 
 export function generateOGImageUrl(
   config: Partial<OGImageConfig>,
-  baseUrl?: string
+  baseUrl?: string,
 ): string {
   const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID
 
@@ -63,8 +63,12 @@ export function generateOGImageUrl(
     ...(merged.image && { image: merged.image }),
     ...(merged.backgroundColor && { bgColor: merged.backgroundColor }),
     ...(merged.titleColor && { titleColor: merged.titleColor }),
-    ...(merged.descriptionColor && { descriptionColor: merged.descriptionColor }),
-    ...(merged.fontSize?.title && { titleSize: merged.fontSize.title.toString() }),
+    ...(merged.descriptionColor && {
+      descriptionColor: merged.descriptionColor,
+    }),
+    ...(merged.fontSize?.title && {
+      titleSize: merged.fontSize.title.toString(),
+    }),
     ...(merged.fontSize?.description && {
       descSize: merged.fontSize.description.toString(),
     }),
@@ -74,7 +78,14 @@ export function generateOGImageUrl(
 }
 
 export function createOGMetaTags(config: OGMetaTags) {
-  const { title, description, image, url, type = 'website', twitterHandle } = config
+  const {
+    title,
+    description,
+    image,
+    url,
+    type = 'website',
+    twitterHandle,
+  } = config
 
   return {
     meta: [
@@ -87,7 +98,9 @@ export function createOGMetaTags(config: OGMetaTags) {
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: image },
-      ...(twitterHandle ? [{ name: 'twitter:creator', content: twitterHandle }] : []),
+      ...(twitterHandle
+        ? [{ name: 'twitter:creator', content: twitterHandle }]
+        : []),
       { name: 'description', content: description },
     ],
   }

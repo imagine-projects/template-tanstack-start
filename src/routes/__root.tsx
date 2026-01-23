@@ -45,7 +45,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       title: 'Imagine App',
       description: 'Build amazing applications with TanStack',
       image: ogImageUrl,
-      url: typeof window !== 'undefined' ? window.location.href : 'https://imagine.projects',
+      url:
+        typeof window !== 'undefined'
+          ? window.location.href
+          : 'https://imagine.projects',
     })
 
     return {
