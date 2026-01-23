@@ -27,7 +27,7 @@ export interface OGMetaTags {
 
 export const defaultOGConfig: OGImageConfig = {
   title: 'Imagine App',
-  description: 'Build amazing applications with TanStack',
+  description: 'Build something real',
   width: 1200,
   height: 630,
   backgroundColor: '#ffffff',
