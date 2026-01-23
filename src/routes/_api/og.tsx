@@ -2,6 +2,23 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ImageResponse } from '@vercel/og'
 import { defaultOGConfig } from '@/lib/og-config'
 
+async function loadGoogleFont(font: string, text: string) {
+  const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`
+  const css = await (await fetch(url)).text()
+  const resource = css.match(
+    /src: url\((.+?)\) format\('(woff2|opentype|truetype)'\)/,
+  )
+
+  if (resource) {
+    const response = await fetch(resource[1])
+    if (response.status == 200) {
+      return await response.arrayBuffer()
+    }
+  }
+
+  throw new Error('failed to load font data')
+}
+
 export const Route = createFileRoute('/_api/og')({
   server: {
     handlers: {
@@ -31,6 +48,9 @@ export const Route = createFileRoute('/_api/og')({
         const width = defaultOGConfig.width || 1200
         const height = defaultOGConfig.height || 630
 
+        const text = `${title}${description ? ` ${description}` : ''}`
+        const fontData = await loadGoogleFont('Inter', text)
+
         return new ImageResponse(
           (
             <div
@@ -53,6 +73,7 @@ export const Route = createFileRoute('/_api/og')({
                   justifyContent: 'center',
                   alignItems: 'flex-start',
                   maxWidth: '90%',
+                  fontFamily: 'Inter',
                 }}
               >
                 {/* Logo */}
@@ -117,6 +138,13 @@ export const Route = createFileRoute('/_api/og')({
           {
             width,
             height,
+            fonts: [
+              {
+                name: 'Inter',
+                data: fontData,
+                style: 'normal',
+              },
+            ],
           },
         ) as unknown as Response
       },
