@@ -9,6 +9,13 @@ import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import { authMiddleware } from '@/server/functions/auth'
+import { getBaseUrl } from '@/server/functions/request'
+import {
+  createOGMetaTags,
+  generateOGImageUrl,
+  OGImageConfig,
+  OGMetaTags,
+} from '@/lib/og-config'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -29,32 +36,57 @@ if (import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC) {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   loader: async () => {
     const { currentUser } = await authMiddleware()
+    const baseUrl = await getBaseUrl()
 
     return {
       currentUser,
+      baseUrl,
     }
   },
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Imagine App',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-    scripts: [...scripts],
-  }),
+  head: ({ loaderData }) => {
+    const baseUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : (loaderData?.baseUrl ?? 'https://imagine.dev')
+
+    const config: OGImageConfig = {
+      isCustom: false,
+    }
+
+    const ogImageUrl = generateOGImageUrl(config, baseUrl)
+
+    const metadata: OGMetaTags = {
+      title: 'Imagine App',
+      description: 'Build something real',
+      image: ogImageUrl,
+      url: typeof window !== 'undefined' ? window.location.href : baseUrl,
+    }
+
+    const ogTags = createOGMetaTags(metadata)
+
+    return {
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        {
+          title: 'Imagine App',
+        },
+        ...ogTags.meta,
+      ],
+      links: [
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+      ],
+      scripts: [...scripts],
+    }
+  },
 
   shellComponent: RootDocument,
 })
