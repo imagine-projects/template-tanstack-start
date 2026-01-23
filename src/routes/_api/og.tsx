@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ImageResponse } from '@vercel/og'
-import { defaultOGConfig } from '@/lib/og-config'
+import { defaultCustomOGConfig } from '@/lib/og-config'
 
 async function loadGoogleFont(font: string, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`
@@ -22,31 +22,53 @@ async function loadGoogleFont(font: string, text: string) {
 export const Route = createFileRoute('/_api/og')({
   server: {
     handlers: {
-      GET: async () => {
-        const searchParams = new URLSearchParams()
+      GET: async ({ request }) => {
+        const { searchParams } = new URL(request.url)
 
-        const title = searchParams.get('title') || defaultOGConfig.title
+        if (!searchParams.toString()) {
+          const assetUrl = new URL('/default-og-image.png', request.url)
+          const assetResponse = await fetch(assetUrl)
+
+          if (!assetResponse.ok || !assetResponse.body) {
+            return new Response('Default OG image not found', {
+              status: 500,
+            })
+          }
+
+          return new Response(assetResponse.body, {
+            status: assetResponse.status,
+            headers: {
+              'Content-Type':
+                assetResponse.headers.get('content-type') || 'image/png',
+              'Cache-Control':
+                assetResponse.headers.get('cache-control') ||
+                'public, max-age=604800, immutable',
+            },
+          })
+        }
+
+        const title = searchParams.get('title') || defaultCustomOGConfig.title
         const description =
-          searchParams.get('description') || defaultOGConfig.description
+          searchParams.get('description') || defaultCustomOGConfig.description
         const bgColor =
-          searchParams.get('bgColor') || defaultOGConfig.backgroundColor
+          searchParams.get('bgColor') || defaultCustomOGConfig.backgroundColor
         const titleColor =
-          searchParams.get('titleColor') || defaultOGConfig.titleColor
+          searchParams.get('titleColor') || defaultCustomOGConfig.titleColor
         const descriptionColor =
           searchParams.get('descriptionColor') ||
-          defaultOGConfig.descriptionColor
+          defaultCustomOGConfig.descriptionColor
         const titleSize = parseInt(
           searchParams.get('titleSize') ||
-            defaultOGConfig.fontSize?.title.toString() ||
+            defaultCustomOGConfig.fontSize?.title.toString() ||
             '60',
         )
         const descSize = parseInt(
           searchParams.get('descSize') ||
-            defaultOGConfig.fontSize?.description.toString() ||
+            defaultCustomOGConfig.fontSize?.description.toString() ||
             '30',
         )
-        const width = defaultOGConfig.width || 1200
-        const height = defaultOGConfig.height || 630
+        const width = defaultCustomOGConfig.width || 1200
+        const height = defaultCustomOGConfig.height || 630
 
         const text = `${title}${description ? ` ${description}` : ''}`
         const fontData = await loadGoogleFont('Inter', text)
@@ -63,7 +85,7 @@ export const Route = createFileRoute('/_api/og')({
                 height: '100%',
                 backgroundColor: bgColor,
                 padding: '60px',
-                fontFamily: defaultOGConfig.fontFamily,
+                fontFamily: 'Inter, sans-serif',
               }}
             >
               <div

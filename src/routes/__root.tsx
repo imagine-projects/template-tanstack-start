@@ -46,8 +46,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
     const ogImageUrl = generateOGImageUrl(
       {
-        title: 'Imagine App',
-        description: 'Build something real',
+        isCustom: false,
       },
       baseUrl,
     )

@@ -1,5 +1,6 @@
 export interface OGImageConfig {
-  title: string
+  isCustom: boolean
+  title?: string
   description?: string
   image?: string
   icon?: string
@@ -12,7 +13,6 @@ export interface OGImageConfig {
     title: number
     description: number
   }
-  fontFamily?: string
   borderRadius?: number
 }
 
@@ -25,7 +25,8 @@ export interface OGMetaTags {
   twitterHandle?: string
 }
 
-export const defaultOGConfig: OGImageConfig = {
+export const defaultCustomOGConfig: OGImageConfig = {
+  isCustom: true,
   title: 'Imagine App',
   description: 'Build something real',
   width: 1200,
@@ -37,7 +38,6 @@ export const defaultOGConfig: OGImageConfig = {
     title: 60,
     description: 30,
   },
-  fontFamily: 'system-ui, -apple-system, sans-serif',
   borderRadius: 12,
 }
 
@@ -45,10 +45,16 @@ export function generateOGImageUrl(
   config: Partial<OGImageConfig>,
   baseUrl: string,
 ): string {
-  const merged = { ...defaultOGConfig, ...config }
+  const defaultOGUrl = `${baseUrl.replace(/\/$/, '')}/og`
+
+  if (!config.isCustom) {
+    return defaultOGUrl
+  }
+
+  const merged = { ...defaultCustomOGConfig, ...config }
 
   const params = new URLSearchParams({
-    title: merged.title,
+    ...(merged.title && { title: merged.title }),
     ...(merged.description && { description: merged.description }),
     ...(merged.image && { image: merged.image }),
     ...(merged.backgroundColor && { bgColor: merged.backgroundColor }),
@@ -64,7 +70,7 @@ export function generateOGImageUrl(
     }),
   })
 
-  return `${baseUrl.replace(/\/$/, '')}/og?${params.toString()}`
+  return `${defaultOGUrl}?${params.toString()}`
 }
 
 export function createOGMetaTags(config: OGMetaTags) {
