@@ -9,6 +9,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import { authMiddleware } from '@/server/functions/auth'
+import { createOGMetaTags, generateOGImageUrl } from '@/lib/og-config'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -34,27 +35,42 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       currentUser,
     }
   },
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Imagine App',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-    scripts: [...scripts],
-  }),
+  head: () => {
+    const ogImageUrl = generateOGImageUrl({
+      title: 'Imagine App',
+      description: 'Build amazing applications with TanStack',
+    })
+
+    const ogTags = createOGMetaTags({
+      title: 'Imagine App',
+      description: 'Build amazing applications with TanStack',
+      image: ogImageUrl,
+      url: typeof window !== 'undefined' ? window.location.href : 'https://imagine.projects',
+    })
+
+    return {
+      meta: [
+        {
+          charSet: 'utf-8',
+        },
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        },
+        {
+          title: 'Imagine App',
+        },
+        ...ogTags.meta,
+      ],
+      links: [
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+      ],
+      scripts: [...scripts],
+    }
+  },
 
   shellComponent: RootDocument,
 })
