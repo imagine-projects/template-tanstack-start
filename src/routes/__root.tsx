@@ -38,12 +38,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => {
     const ogImageUrl = generateOGImageUrl({
       title: 'Imagine App',
-      description: 'Build amazing applications with TanStack',
+      description: 'Build something real',
     })
 
     const ogTags = createOGMetaTags({
       title: 'Imagine App',
-      description: 'Build amazing applications with TanStack',
+      description: 'Build something real',
       image: ogImageUrl,
       url:
         typeof window !== 'undefined'
