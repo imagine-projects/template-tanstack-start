@@ -9,6 +9,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import { authMiddleware } from '@/server/functions/auth'
+import { getBaseUrl } from '@/server/functions/request'
 import { createOGMetaTags, generateOGImageUrl } from '@/lib/og-config'
 
 interface MyRouterContext {
@@ -30,25 +31,32 @@ if (import.meta.env.VITE_INSTRUMENTATION_SCRIPT_SRC) {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   loader: async () => {
     const { currentUser } = await authMiddleware()
+    const baseUrl = await getBaseUrl()
 
     return {
       currentUser,
+      baseUrl,
     }
   },
-  head: () => {
-    const ogImageUrl = generateOGImageUrl({
-      title: 'Imagine App',
-      description: 'Build something real',
-    })
+  head: ({ loaderData }) => {
+    const baseUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : loaderData?.baseUrl ?? 'https://imagine.dev'
+
+    const ogImageUrl = generateOGImageUrl(
+      {
+        title: 'Imagine App',
+        description: 'Build something real',
+      },
+      baseUrl,
+    )
 
     const ogTags = createOGMetaTags({
       title: 'Imagine App',
       description: 'Build something real',
       image: ogImageUrl,
-      url:
-        typeof window !== 'undefined'
-          ? window.location.href
-          : 'https://imagine.projects',
+      url: typeof window !== 'undefined' ? window.location.href : baseUrl,
     })
 
     return {

@@ -43,18 +43,8 @@ export const defaultOGConfig: OGImageConfig = {
 
 export function generateOGImageUrl(
   config: Partial<OGImageConfig>,
-  baseUrl?: string,
+  baseUrl: string,
 ): string {
-  const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID
-
-  const resolvedBaseUrl =
-    baseUrl ??
-    (typeof window !== 'undefined'
-      ? window.location.origin
-      : projectId
-        ? `https://imagine-${projectId}.appwrite.network`
-        : 'http://localhost:3000')
-
   const merged = { ...defaultOGConfig, ...config }
 
   const params = new URLSearchParams({
@@ -74,7 +64,7 @@ export function generateOGImageUrl(
     }),
   })
 
-  return `${resolvedBaseUrl.replace(/\/$/, '')}/og?${params.toString()}`
+  return `${baseUrl.replace(/\/$/, '')}/og?${params.toString()}`
 }
 
 export function createOGMetaTags(config: OGMetaTags) {
