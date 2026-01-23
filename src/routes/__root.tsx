@@ -10,7 +10,12 @@ import { Toaster } from '@/components/ui/sonner'
 import { ThemeProvider } from 'next-themes'
 import { authMiddleware } from '@/server/functions/auth'
 import { getBaseUrl } from '@/server/functions/request'
-import { createOGMetaTags, generateOGImageUrl } from '@/lib/og-config'
+import {
+  createOGMetaTags,
+  generateOGImageUrl,
+  OGImageConfig,
+  OGMetaTags,
+} from '@/lib/og-config'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -44,19 +49,20 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         ? window.location.origin
         : (loaderData?.baseUrl ?? 'https://imagine.dev')
 
-    const ogImageUrl = generateOGImageUrl(
-      {
-        isCustom: false,
-      },
-      baseUrl,
-    )
+    const config: OGImageConfig = {
+      isCustom: false,
+    }
 
-    const ogTags = createOGMetaTags({
+    const ogImageUrl = generateOGImageUrl(config, baseUrl)
+
+    const metadata: OGMetaTags = {
       title: 'Imagine App',
       description: 'Build something real',
       image: ogImageUrl,
       url: typeof window !== 'undefined' ? window.location.href : baseUrl,
-    })
+    }
+
+    const ogTags = createOGMetaTags(metadata)
 
     return {
       meta: [

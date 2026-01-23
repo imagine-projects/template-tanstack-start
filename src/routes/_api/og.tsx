@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { ImageResponse } from '@vercel/og'
+import { getBaseUrl } from '@/server/functions/request'
 import { defaultCustomOGConfig } from '@/lib/og-config'
 
 async function loadGoogleFont(font: string, text: string) {
@@ -26,7 +27,8 @@ export const Route = createFileRoute('/_api/og')({
         const { searchParams } = new URL(request.url)
 
         if (!searchParams.toString()) {
-          const assetUrl = new URL('/default-og-image.png', request.url)
+          const baseUrl = await getBaseUrl()
+          const assetUrl = new URL('/default-og-image.png', baseUrl)
           const assetResponse = await fetch(assetUrl)
 
           if (!assetResponse.ok || !assetResponse.body) {

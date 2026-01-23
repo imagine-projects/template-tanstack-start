@@ -1,4 +1,4 @@
-export interface OGImageConfig {
+export type OGImageConfig = {
   isCustom: boolean
   title?: string
   description?: string
@@ -16,7 +16,7 @@ export interface OGImageConfig {
   borderRadius?: number
 }
 
-export interface OGMetaTags {
+export type OGMetaTags = {
   title: string
   description: string
   image: string
