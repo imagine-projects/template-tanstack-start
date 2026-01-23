@@ -42,7 +42,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     const baseUrl =
       typeof window !== 'undefined'
         ? window.location.origin
-        : loaderData?.baseUrl ?? 'https://imagine.dev'
+        : (loaderData?.baseUrl ?? 'https://imagine.dev')
 
     const ogImageUrl = generateOGImageUrl(
       {
