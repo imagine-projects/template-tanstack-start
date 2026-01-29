@@ -29,25 +29,6 @@ export const Route = createFileRoute('/_api/og')({
 
         const baseUrl = await getBaseUrl()
 
-        // Get screenshot of the homepage. If running locally, use the Imagine website instead.
-        const screenshotUrl =
-          baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')
-            ? 'https://imagine.dev'
-            : baseUrl
-
-        let screenshotArrayBuffer: ArrayBuffer | null = null
-        try {
-          screenshotArrayBuffer = await getScreenshot(
-            screenshotUrl,
-            870,
-            543,
-            3, // seconds to wait before taking screenshot
-          )
-        } catch (error) {
-          console.error('Failed to generate screenshot:', error)
-          // Continue without screenshot overlay
-        }
-
         if (!searchParams.toString()) {
           const assetUrl = new URL('/default-og-image.png', baseUrl)
           const assetResponse = await fetch(assetUrl)
@@ -56,6 +37,19 @@ export const Route = createFileRoute('/_api/og')({
             return new Response('Default OG image not found', {
               status: 500,
             })
+          }
+
+          let screenshotArrayBuffer: ArrayBuffer | null = null
+          try {
+            screenshotArrayBuffer = await getScreenshot(
+              baseUrl,
+              870,
+              543,
+              1, // seconds to wait before taking screenshot
+            )
+          } catch (error) {
+            console.error('Failed to generate screenshot:', error)
+            // Continue without screenshot overlay
           }
 
           // Create a composite image with screenshot overlay
@@ -219,21 +213,6 @@ export const Route = createFileRoute('/_api/og')({
                   )}
                 </div>
               </div>
-
-              {/* Screenshot overlay - only render if screenshot was successful */}
-              {screenshotArrayBuffer && (
-                <img
-                  src={`data:image/png;base64,${Buffer.from(screenshotArrayBuffer).toString('base64')}`}
-                  style={{
-                    position: 'absolute',
-                    left: '510px',
-                    top: '44px',
-                    width: '870px',
-                    height: '543px',
-                    borderRadius: '14.48px',
-                  }}
-                />
-              )}
             </div>
           ),
           {
