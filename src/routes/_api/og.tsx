@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { ImageResponse } from '@vercel/og'
 import { getBaseUrl } from '@/server/functions/request'
 import { defaultCustomOGConfig } from '@/lib/og-config'
+import { getScreenshot } from '@/server/lib/avatars'
 
 async function loadGoogleFont(font: string, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`
@@ -26,8 +27,16 @@ export const Route = createFileRoute('/_api/og')({
       GET: async ({ request }) => {
         const { searchParams } = new URL(request.url)
 
+        const baseUrl = await getBaseUrl()
+
+        // Get screenshot of the homepage. If running locally, use the Imagine website instead.
+        const screenshotUrl =
+          baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')
+            ? 'https://imagine.dev'
+            : baseUrl
+        const screenshotArrayBuffer = await getScreenshot(screenshotUrl, 870, 543)
+
         if (!searchParams.toString()) {
-          const baseUrl = await getBaseUrl()
           const assetUrl = new URL('/default-og-image.png', baseUrl)
           const assetResponse = await fetch(assetUrl)
 
@@ -37,16 +46,50 @@ export const Route = createFileRoute('/_api/og')({
             })
           }
 
-          return new Response(assetResponse.body, {
-            status: assetResponse.status,
-            headers: {
-              'Content-Type':
-                assetResponse.headers.get('content-type') || 'image/png',
-              'Cache-Control':
-                assetResponse.headers.get('cache-control') ||
-                'public, max-age=604800, immutable',
+          // Convert screenshot buffer to base64 for embedding
+          const screenshotBase64 = Buffer.from(screenshotArrayBuffer).toString(
+            'base64',
+          )
+
+          // Create a composite image with screenshot overlay
+          return new ImageResponse(
+            (
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  height: '100%',
+                  position: 'relative',
+                }}
+              >
+                {/* Background image */}
+                <img
+                  src={assetUrl.toString()}
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                  }}
+                />
+                {/* Screenshot overlay */}
+                <img
+                  src={`data:image/png;base64,${screenshotBase64}`}
+                  style={{
+                    position: 'absolute',
+                    left: '510px',
+                    top: '44px',
+                    width: '870px',
+                    height: '543px',
+                    borderRadius: '14.48px',
+                  }}
+                />
+              </div>
+            ),
+            {
+              width: 1200,
+              height: 630,
             },
-          })
+          ) as unknown as Response
         }
 
         const title = searchParams.get('title') || defaultCustomOGConfig.title
@@ -75,31 +118,45 @@ export const Route = createFileRoute('/_api/og')({
         const text = `${title}${description ? ` ${description}` : ''}`
         const fontData = await loadGoogleFont('Inter', text)
 
+        // Convert screenshot buffer to base64 for embedding
+        const screenshotBase64 = Buffer.from(screenshotArrayBuffer).toString(
+          'base64',
+        )
+
         return new ImageResponse(
           (
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
                 width: '100%',
                 height: '100%',
+                position: 'relative',
                 backgroundColor: bgColor,
-                padding: '60px',
-                fontFamily: 'Inter, sans-serif',
               }}
             >
+              {/* Content section */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'flex-start',
-                  maxWidth: '90%',
-                  fontFamily: 'Inter',
+                  width: '100%',
+                  height: '100%',
+                  padding: '60px',
+                  fontFamily: 'Inter, sans-serif',
                 }}
               >
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                    maxWidth: '90%',
+                    fontFamily: 'Inter',
+                  }}
+                >
                 {/* Logo */}
                 <div
                   style={{
@@ -156,7 +213,21 @@ export const Route = createFileRoute('/_api/og')({
                     {description}
                   </p>
                 )}
+                </div>
               </div>
+
+              {/* Screenshot overlay */}
+              <img
+                src={`data:image/png;base64,${screenshotBase64}`}
+                style={{
+                  position: 'absolute',
+                  left: '510px',
+                  top: '44px',
+                  width: '870px',
+                  height: '543px',
+                  borderRadius: '14.48px',
+                }}
+              />
             </div>
           ),
           {
