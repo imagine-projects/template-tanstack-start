@@ -38,13 +38,13 @@ export async function createSessionClient(session: string) {
     account: new Account(client),
     users: new Users(client),
     storage: new Storage(client),
-    avatars: new Avatars(client),
   }
 }
 
 export function createAdminClient(): {
   client: Client
   account: Account
+  avatars: Avatars
 } {
   const { endpoint, projectId, apiKey } = getAppwriteClientCredentials()
   const client = new Client()
@@ -55,5 +55,6 @@ export function createAdminClient(): {
   return {
     client: client,
     account: new Account(client),
+    avatars: new Avatars(client),
   }
 }

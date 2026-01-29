@@ -1,5 +1,4 @@
-import { getAppwriteSessionFn } from '../functions/auth'
-import { createSessionClient } from './appwrite'
+import { createAdminClient } from './appwrite'
 
 export async function getScreenshot(
   url: string,
@@ -8,9 +7,7 @@ export async function getScreenshot(
   sleep?: number,
 ) {
   try {
-    const session = await getAppwriteSessionFn()
-
-    const { avatars } = await createSessionClient(session!)
+    const { avatars } = createAdminClient()
 
     return await avatars.getScreenshot({
       url,
