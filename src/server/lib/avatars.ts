@@ -7,14 +7,19 @@ export async function getScreenshot(
   height?: number,
   sleep?: number,
 ) {
-  const session = await getAppwriteSessionFn()
+  try {
+    const session = await getAppwriteSessionFn()
 
-  const { avatars } = await createSessionClient(session!)
+    const { avatars } = await createSessionClient(session!)
 
-  return await avatars.getScreenshot({
-    url,
-    width,
-    height,
-    sleep,
-  })
+    return await avatars.getScreenshot({
+      url,
+      width,
+      height,
+      sleep,
+    })
+  } catch (error) {
+    console.error('Error getting screenshot:', error)
+    throw error
+  }
 }

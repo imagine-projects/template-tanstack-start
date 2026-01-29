@@ -34,12 +34,19 @@ export const Route = createFileRoute('/_api/og')({
           baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')
             ? 'https://imagine.dev'
             : baseUrl
-        const screenshotArrayBuffer = await getScreenshot(
-          screenshotUrl,
-          870,
-          543,
-          3 // seconds to wait before taking screenshot
-        )
+        
+        let screenshotArrayBuffer: ArrayBuffer | null = null
+        try {
+          screenshotArrayBuffer = await getScreenshot(
+            screenshotUrl,
+            870,
+            543,
+            3 // seconds to wait before taking screenshot
+          )
+        } catch (error) {
+          console.error('Failed to generate screenshot:', error)
+          // Continue without screenshot overlay
+        }
 
         if (!searchParams.toString()) {
           const assetUrl = new URL('/default-og-image.png', baseUrl)
@@ -50,11 +57,6 @@ export const Route = createFileRoute('/_api/og')({
               status: 500,
             })
           }
-
-          // Convert screenshot buffer to base64 for embedding
-          const screenshotBase64 = Buffer.from(screenshotArrayBuffer).toString(
-            'base64',
-          )
 
           // Create a composite image with screenshot overlay
           return new ImageResponse(
@@ -76,18 +78,20 @@ export const Route = createFileRoute('/_api/og')({
                     height: '100%',
                   }}
                 />
-                {/* Screenshot overlay */}
-                <img
-                  src={`data:image/png;base64,${screenshotBase64}`}
-                  style={{
-                    position: 'absolute',
-                    left: '510px',
-                    top: '44px',
-                    width: '870px',
-                    height: '543px',
-                    borderRadius: '14.48px',
-                  }}
-                />
+                {/* Screenshot overlay - only render if screenshot was successful */}
+                {screenshotArrayBuffer && (
+                  <img
+                    src={`data:image/png;base64,${Buffer.from(screenshotArrayBuffer).toString('base64')}`}
+                    style={{
+                      position: 'absolute',
+                      left: '510px',
+                      top: '44px',
+                      width: '870px',
+                      height: '543px',
+                      borderRadius: '14.48px',
+                    }}
+                  />
+                )}
               </div>
             ),
             {
@@ -122,11 +126,6 @@ export const Route = createFileRoute('/_api/og')({
 
         const text = `${title}${description ? ` ${description}` : ''}`
         const fontData = await loadGoogleFont('Inter', text)
-
-        // Convert screenshot buffer to base64 for embedding
-        const screenshotBase64 = Buffer.from(screenshotArrayBuffer).toString(
-          'base64',
-        )
 
         return new ImageResponse(
           (
@@ -221,18 +220,20 @@ export const Route = createFileRoute('/_api/og')({
                 </div>
               </div>
 
-              {/* Screenshot overlay */}
-              <img
-                src={`data:image/png;base64,${screenshotBase64}`}
-                style={{
-                  position: 'absolute',
-                  left: '510px',
-                  top: '44px',
-                  width: '870px',
-                  height: '543px',
-                  borderRadius: '14.48px',
-                }}
-              />
+              {/* Screenshot overlay - only render if screenshot was successful */}
+              {screenshotArrayBuffer && (
+                <img
+                  src={`data:image/png;base64,${Buffer.from(screenshotArrayBuffer).toString('base64')}`}
+                  style={{
+                    position: 'absolute',
+                    left: '510px',
+                    top: '44px',
+                    width: '870px',
+                    height: '543px',
+                    borderRadius: '14.48px',
+                  }}
+                />
+              )}
             </div>
           ),
           {
