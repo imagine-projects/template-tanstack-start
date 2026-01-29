@@ -38,6 +38,7 @@ export const Route = createFileRoute('/_api/og')({
           screenshotUrl,
           870,
           543,
+          3 // seconds to wait before taking screenshot
         )
 
         if (!searchParams.toString()) {

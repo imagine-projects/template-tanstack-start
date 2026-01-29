@@ -5,6 +5,7 @@ export async function getScreenshot(
   url: string,
   width?: number,
   height?: number,
+  sleep?: number,
 ) {
   const session = await getAppwriteSessionFn()
 
@@ -14,5 +15,6 @@ export async function getScreenshot(
     url,
     width,
     height,
+    sleep,
   })
 }
