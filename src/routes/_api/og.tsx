@@ -34,14 +34,14 @@ export const Route = createFileRoute('/_api/og')({
           baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')
             ? 'https://imagine.dev'
             : baseUrl
-        
+
         let screenshotArrayBuffer: ArrayBuffer | null = null
         try {
           screenshotArrayBuffer = await getScreenshot(
             screenshotUrl,
             870,
             543,
-            3 // seconds to wait before taking screenshot
+            3, // seconds to wait before taking screenshot
           )
         } catch (error) {
           console.error('Failed to generate screenshot:', error)
