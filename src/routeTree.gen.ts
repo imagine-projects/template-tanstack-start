@@ -19,6 +19,7 @@ import { Route as AuthSignOutRouteImport } from './routes/_auth/sign-out'
 import { Route as AuthSignInRouteImport } from './routes/_auth/sign-in'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as ApiOgRouteImport } from './routes/_api/og'
 import { Route as ApiHelloRouteImport } from './routes/_api/hello'
 
 const PublicRoute = PublicRouteImport.update({
@@ -69,6 +70,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const ApiOgRoute = ApiOgRouteImport.update({
+  id: '/_api/og',
+  path: '/og',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiHelloRoute = ApiHelloRouteImport.update({
   id: '/_api/hello',
   path: '/hello',
@@ -77,6 +83,7 @@ const ApiHelloRoute = ApiHelloRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/hello': typeof ApiHelloRoute
+  '/og': typeof ApiOgRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/hello': typeof ApiHelloRoute
+  '/og': typeof ApiOgRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-in': typeof AuthSignInRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/_protected': typeof ProtectedRouteWithChildren
   '/_public': typeof PublicRouteWithChildren
   '/_api/hello': typeof ApiHelloRoute
+  '/_api/og': typeof ApiOgRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-in': typeof AuthSignInRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/hello'
+    | '/og'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/hello'
+    | '/og'
     | '/forgot-password'
     | '/reset-password'
     | '/sign-in'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/_protected'
     | '/_public'
     | '/_api/hello'
+    | '/_api/og'
     | '/_auth/forgot-password'
     | '/_auth/reset-password'
     | '/_auth/sign-in'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   ProtectedRoute: typeof ProtectedRouteWithChildren
   PublicRoute: typeof PublicRouteWithChildren
   ApiHelloRoute: typeof ApiHelloRoute
+  ApiOgRoute: typeof ApiOgRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_api/og': {
+      id: '/_api/og'
+      path: '/og'
+      fullPath: '/og'
+      preLoaderRoute: typeof ApiOgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_api/hello': {
       id: '/_api/hello'
       path: '/hello'
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProtectedRoute: ProtectedRouteWithChildren,
   PublicRoute: PublicRouteWithChildren,
   ApiHelloRoute: ApiHelloRoute,
+  ApiOgRoute: ApiOgRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
