@@ -13,6 +13,8 @@ export async function getScreenshot(
       url,
       width,
       height,
+      viewportWidth: width,
+      viewportHeight: height,
       sleep,
     })
   } catch (error) {
