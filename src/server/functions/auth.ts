@@ -80,6 +80,15 @@ export const signUpFn = createServerFn({ method: 'POST' })
     const { account } = createAdminClient()
 
     try {
+      // Get the base URL from the origin header (includes protocol)
+      const origin = getRequestHeader('origin')
+      if (!origin) {
+        throw new Error('Missing origin header')
+      }
+
+      // Ensure Appwrite gets the origin header
+      account.client.addHeader('origin', origin)
+
       await account.create({ userId: ID.unique(), email, password })
       const session = await account.createEmailPasswordSession({
         email,
@@ -112,9 +121,18 @@ export const signInFn = createServerFn({ method: 'POST' })
   .inputValidator(signUpInSchema)
   .handler(async ({ data }) => {
     const { email, password, redirect: redirectUrl } = data
+    const { account } = createAdminClient()
 
     try {
-      const { account } = createAdminClient()
+      // Get the base URL from the origin header (includes protocol)
+      const origin = getRequestHeader('origin')
+      if (!origin) {
+        throw new Error('Missing origin header')
+      }
+
+      // Ensure Appwrite gets the origin header
+      account.client.addHeader('origin', origin)
+
       const session = await account.createEmailPasswordSession({
         email,
         password,
@@ -214,8 +232,11 @@ export const forgotPasswordFn = createServerFn({ method: 'POST' })
       if (!origin) {
         throw new Error('Missing origin header')
       }
-      const resetUrl = `${origin}/reset-password`
 
+      // Ensure Appwrite gets the origin header
+      account.client.addHeader('origin', origin)
+
+      const resetUrl = `${origin}/reset-password`
       await account.createRecovery({ email, url: resetUrl })
 
       return {
@@ -243,6 +264,7 @@ export const resetPasswordFn = createServerFn({ method: 'POST' })
   .inputValidator(resetPasswordSchema)
   .handler(async ({ data }) => {
     const { userId, secret, password, confirmPassword } = data
+    const { account } = createAdminClient()
 
     if (password !== confirmPassword) {
       setResponseStatus(400)
@@ -253,7 +275,15 @@ export const resetPasswordFn = createServerFn({ method: 'POST' })
     }
 
     try {
-      const { account } = createAdminClient()
+      // Get the base URL from the origin header (includes protocol)
+      const origin = getRequestHeader('origin')
+      if (!origin) {
+        throw new Error('Missing origin header')
+      }
+
+      // Ensure Appwrite gets the origin header
+      account.client.addHeader('origin', origin)
+
       await account.updateRecovery({
         userId,
         secret,
