@@ -6,7 +6,6 @@
     "dev": "vite dev --port 3000",
     "start": "bun run server.ts",
     "build": "tsr generate && tsc --noEmit && vite build --sourcemap",
-    "build:node": "tsr generate && vite build",
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint",
