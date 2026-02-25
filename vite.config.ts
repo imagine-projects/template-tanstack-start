@@ -22,7 +22,11 @@ const config = defineConfig({
         preset: 'node',
       }),
     devtoolsJson(),
-    viteReact(),
+    viteReact({
+      babel: {
+        plugins: ['babel-plugin-react-compiler'],
+      },
+    }),
   ],
   server: {
     host: '::',
