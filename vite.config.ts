@@ -6,6 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 import devtoolsJson from 'vite-plugin-devtools-json'
 import { nitro } from 'nitro/vite'
 
+const forSites = process.env?.FOR_SITES === 'true'
+
 const config = defineConfig({
   plugins: [
     // this is the plugin that enables path aliases
@@ -14,7 +16,7 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    nitro(),
+    forSites && nitro(),
     devtoolsJson(),
     viteReact(),
   ],
