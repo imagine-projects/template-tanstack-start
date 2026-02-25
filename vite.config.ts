@@ -4,7 +4,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import devtoolsJson from 'vite-plugin-devtools-json'
-import { nitro } from 'nitro/vite';
+import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
   plugins: [
@@ -24,7 +24,7 @@ const config = defineConfig({
     hmr: true,
   },
   nitro: {
-    preset: 'node_server'
+    preset: 'node_server',
   },
 })
 
