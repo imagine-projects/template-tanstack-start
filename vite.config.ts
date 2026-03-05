@@ -4,9 +4,7 @@ import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from '@tailwindcss/vite'
 import devtoolsJson from 'vite-plugin-devtools-json'
-import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin'
-
-const forSites = process.env?.FOR_SITES === 'true'
+import { nitro } from 'nitro/vite'
 
 const config = defineConfig({
   plugins: [
@@ -16,11 +14,7 @@ const config = defineConfig({
     }),
     tailwindcss(),
     tanstackStart(),
-    forSites &&
-      nitroV2Plugin({
-        compatibilityDate: '2025-10-08',
-        preset: 'node',
-      }),
+    nitro(),
     devtoolsJson(),
     viteReact(),
   ],
@@ -28,6 +22,9 @@ const config = defineConfig({
     host: '::',
     allowedHosts: true,
     hmr: true,
+  },
+  nitro: {
+    preset: 'node_server',
   },
 })
 
