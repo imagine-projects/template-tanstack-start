@@ -16,6 +16,7 @@ import {
   OGImageConfig,
   OGMetaTags,
 } from '@/lib/og-config'
+import { websiteInfo } from '@/lib/website-info'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -53,16 +54,30 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       isCustom: false,
     }
 
-    const ogImageUrl = generateOGImageUrl(config, baseUrl)
+    const ogImageUrl = websiteInfo.ogImageUrl ?? generateOGImageUrl(config, baseUrl)
 
     const metadata: OGMetaTags = {
-      title: 'Imagine App',
-      description: 'Build something real',
+      title: websiteInfo.title ?? 'Imagine App',
+      description: websiteInfo.description ?? '',
       image: ogImageUrl,
       url: typeof window !== 'undefined' ? window.location.href : baseUrl,
     }
 
     const ogTags = createOGMetaTags(metadata)
+
+    const links: Array<Record<string, string>> = [
+      {
+        rel: 'stylesheet',
+        href: appCss,
+      },
+    ]
+
+    if (websiteInfo.faviconUrl) {
+      links.push({
+        rel: 'icon',
+        href: websiteInfo.faviconUrl,
+      })
+    }
 
     return {
       meta: [
@@ -74,16 +89,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           content: 'width=device-width, initial-scale=1',
         },
         {
-          title: 'Imagine App',
+          title: websiteInfo.title ?? 'Imagine App',
         },
         ...ogTags.meta,
       ],
-      links: [
-        {
-          rel: 'stylesheet',
-          href: appCss,
-        },
-      ],
+      links,
       scripts: [...scripts],
     }
   },
