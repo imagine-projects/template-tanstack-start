@@ -16,7 +16,7 @@ import {
   OGImageConfig,
   OGMetaTags,
 } from '@/lib/og-config'
-import { applyWebsiteInfoHead } from "@/lib/apply-website-info-head";
+import { applyWebsiteInfoHead } from '@/lib/apply-website-info-head'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -44,7 +44,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       baseUrl,
     }
   },
-  
+
   head: ({ loaderData }) => {
     const baseUrl =
       typeof window !== 'undefined'
