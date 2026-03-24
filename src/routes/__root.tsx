@@ -16,7 +16,7 @@ import {
   OGImageConfig,
   OGMetaTags,
 } from '@/lib/og-config'
-import { websiteInfo } from '@/lib/website-info'
+import { applyWebsiteInfoHead } from "@/lib/apply-website-info-head";
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -44,6 +44,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       baseUrl,
     }
   },
+  
   head: ({ loaderData }) => {
     const baseUrl =
       typeof window !== 'undefined'
@@ -54,32 +55,18 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       isCustom: false,
     }
 
-    const ogImageUrl = websiteInfo.ogImageUrl ?? generateOGImageUrl(config, baseUrl)
+    const ogImageUrl = generateOGImageUrl(config, baseUrl)
 
     const metadata: OGMetaTags = {
-      title: websiteInfo.title ?? 'Imagine App',
-      description: websiteInfo.description ?? '',
+      title: 'Imagine App',
+      description: 'Build something real',
       image: ogImageUrl,
       url: typeof window !== 'undefined' ? window.location.href : baseUrl,
     }
 
     const ogTags = createOGMetaTags(metadata)
 
-    const links: Array<Record<string, string>> = [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ]
-
-    if (websiteInfo.faviconUrl) {
-      links.push({
-        rel: 'icon',
-        href: websiteInfo.faviconUrl,
-      })
-    }
-
-    return {
+    return applyWebsiteInfoHead({
       meta: [
         {
           charSet: 'utf-8',
@@ -89,13 +76,18 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           content: 'width=device-width, initial-scale=1',
         },
         {
-          title: websiteInfo.title ?? 'Imagine App',
+          title: 'Imagine App',
         },
         ...ogTags.meta,
       ],
-      links,
+      links: [
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+      ],
       scripts: [...scripts],
-    }
+    })
   },
 
   shellComponent: RootDocument,
