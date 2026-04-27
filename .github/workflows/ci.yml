@@ -95,5 +95,5 @@ jobs:
         with:
           sandboxProviderApiKey: ${{ secrets.SANDBOX_PROVIDER_API_KEY }}
           dockerTags: ${{ steps.meta.outputs.tags }}
-          cpuCount: 4
-          memoryMB: 3072
+          cpuCount: 2
+          memoryMB: 2048
