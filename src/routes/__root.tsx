@@ -16,6 +16,7 @@ import {
   OGImageConfig,
   OGMetaTags,
 } from '@/lib/og-config'
+import { applyWebsiteInfoHead } from '@/lib/apply-website-info-head'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -43,6 +44,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       baseUrl,
     }
   },
+
   head: ({ loaderData }) => {
     const baseUrl =
       typeof window !== 'undefined'
@@ -64,7 +66,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
     const ogTags = createOGMetaTags(metadata)
 
-    return {
+    return applyWebsiteInfoHead({
       meta: [
         {
           charSet: 'utf-8',
@@ -85,7 +87,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         },
       ],
       scripts: [...scripts],
-    }
+    })
   },
 
   shellComponent: RootDocument,
